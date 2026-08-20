@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:qr/qr.dart';
 import 'package:rice_url_shortener/core/utils/qr_drawing_helper.dart';
 import 'package:rice_url_shortener/data/models/qr_config.dart';
 import 'package:rice_url_shortener/data/services/qr_export_service.dart';
@@ -37,9 +38,14 @@ void main() {
   group('QrExportService Generation Tests', () {
     test('generateSvg includes quiet zone in viewBox and translation group', () {
       const config = QrConfig(style: QrStyle.square);
-      final svg = QrExportService.generateSvg('https://link.thejambers.com/r/test1', config, quietZone: 4);
-      expect(svg, contains('viewBox="0 0 41 41"'));
-      expect(svg, contains('<rect width="41" height="41" fill="#FFFFFF"/>'));
+      const url = 'https://link.thejambers.com/r/test1';
+      const quietZone = 4;
+      final qrCode = QrCode.fromData(data: url, errorCorrectLevel: QrErrorCorrectLevel.H);
+      final totalModules = QrImage(qrCode).moduleCount + (quietZone * 2);
+
+      final svg = QrExportService.generateSvg(url, config, quietZone: quietZone);
+      expect(svg, contains('viewBox="0 0 $totalModules $totalModules"'));
+      expect(svg, contains('<rect width="$totalModules" height="$totalModules" fill="#FFFFFF"/>'));
       expect(svg, contains('<g transform="translate(4, 4)">'));
       expect(svg, contains('</g>'));
     });
