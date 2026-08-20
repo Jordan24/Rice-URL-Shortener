@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+import '../../../core/constants/rice_colors.dart';
+import '../../../core/constants/rice_logos.dart';
+
+class QrLogoSelector extends StatelessWidget {
+  final RiceLogoType selectedLogo;
+  final ValueChanged<RiceLogoType> onLogoChanged;
+
+  const QrLogoSelector({
+    super.key,
+    required this.selectedLogo,
+    required this.onLogoChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Center Rice University Logo",
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+        ),
+        const SizedBox(height: 8),
+        Column(
+          children: RiceLogoType.values.map((logo) {
+            final isSelected = logo == selectedLogo;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: InkWell(
+                onTap: () => onLogoChanged(logo),
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isSelected ? RiceColors.riceBlue.withValues(alpha: 0.06) : RiceColors.white,
+                    border: Border.all(
+                      color: isSelected ? RiceColors.riceBlue : RiceColors.borderLight,
+                      width: isSelected ? 1.6 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: logo == RiceLogoType.none ? Colors.grey.shade100 : RiceColors.riceBlue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            logo == RiceLogoType.none ? Icons.not_interested : Icons.verified_rounded,
+                            size: 16,
+                            color: logo == RiceLogoType.none ? RiceColors.textSecondary : RiceColors.laurelGold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              logo.label,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                color: isSelected ? RiceColors.riceBlue : RiceColors.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              logo.description,
+                              style: const TextStyle(fontSize: 11, color: RiceColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Radio<RiceLogoType>(
+                        value: logo,
+                        groupValue: selectedLogo,
+                        activeColor: RiceColors.riceBlue,
+                        onChanged: (val) {
+                          if (val != null) onLogoChanged(val);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}

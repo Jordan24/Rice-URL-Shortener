@@ -1,0 +1,121 @@
+# ==============================================================================
+# Rice URL Shortener & QR Studio - .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Private Files, Environment Variables & Secrets
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+*.local
+*.secret
+*.private
+
+# Service Accounts & GCP / Firebase Credentials
+*serviceAccount*.json
+*service-account*.json
+service_account*.json
+firebase-adminsdk*.json
+private_key.json
+secrets.json
+
+# Firebase & Mobile Credential Files
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# Keystores, Certificates, and Private Keys
+*.keystore
+*.jks
+*.p12
+*.p8
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+key.properties
+local.properties
+
+# ------------------------------------------------------------------------------
+# 2. Firebase & Cloud Functions Artifacts
+# ------------------------------------------------------------------------------
+node_modules/
+functions/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firebase-debug.*.log
+firestore-debug.log*
+ui-debug.log*
+functions/.runtimeconfig.json
+.runtimeconfig.json
+firebase-export-*/
+
+# ------------------------------------------------------------------------------
+# 3. Flutter, Dart & Build Artifacts
+# ------------------------------------------------------------------------------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.pub-cache/
+/build/
+/coverage/
+*.lcov
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# Symbolication & Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Platform build targets
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# ------------------------------------------------------------------------------
+# 4. IDEs, Editors & Workspaces
+# ------------------------------------------------------------------------------
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json.example
+!.vscode/tasks.json.example
+
+# General editors
+*.swp
+*.swo
+*~
+*.bak
+.atom/
+.history/
+.sublime-*
+
+# ------------------------------------------------------------------------------
+# 5. Operating System & Miscellaneous
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.class
+*.pyc
+.build/
+.buildlog/
+.svn/
+.swiftpm/
+migrate_working_dir/
