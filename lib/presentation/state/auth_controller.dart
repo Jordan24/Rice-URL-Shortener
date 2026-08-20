@@ -22,6 +22,7 @@ class AuthController extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get isDevMode => _authService.isDevMode;
 
   Future<bool> signInWithGoogle() async {
     _isLoading = true;
@@ -30,6 +31,31 @@ class AuthController extends ChangeNotifier {
 
     try {
       final user = await _authService.signInWithRiceGoogle();
+      _currentUser = user;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString().replaceAll("Exception: ", "");
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> signInAsDev({
+    String email = "sammy.owl@rice.edu",
+    String displayName = "Sammy the Owl",
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final user = await _authService.signInAsDevUser(
+        email: email,
+        displayName: displayName,
+      );
       _currentUser = user;
       _isLoading = false;
       notifyListeners();

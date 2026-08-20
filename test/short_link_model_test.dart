@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rice_url_shortener/core/constants/rice_logos.dart';
 import 'package:rice_url_shortener/data/models/qr_config.dart';
 import 'package:rice_url_shortener/data/models/short_link.dart';
+import 'package:rice_url_shortener/data/services/firestore_link_service.dart';
+import 'package:rice_url_shortener/presentation/state/link_controller.dart';
 
 void main() {
   group('ShortLink & QrConfig Model Tests', () {
@@ -126,6 +128,85 @@ void main() {
       expect(link.fullShortUrl(), equals('https://link.thejambers.com/owl'));
       expect(link.fullShortUrl('link.thejambers.com'), equals('https://link.thejambers.com/owl'));
       expect(link.fullShortUrl('rice.edu'), equals('https://rice.edu/owl'));
+    });
+  });
+
+  group('LinkController Search and Filtering Tests', () {
+    late FirestoreLinkService linkService;
+    late LinkController linkController;
+
+    setUp(() async {
+      linkService = FirestoreLinkService(firestore: null);
+      linkController = LinkController(linkService: linkService);
+      linkController.init('rice_demo_uid_1912');
+      // Wait for mock links to populate
+      await Future.delayed(Duration.zero);
+    });
+
+    test('Initial state populates links and filteredLinks matches allLinks', () {
+      expect(linkController.allLinks.isNotEmpty, isTrue);
+      expect(linkController.filteredLinks.length, equals(linkController.allLinks.length));
+    });
+
+    test('Filter by shortCode substring (case-insensitive)', () {
+      linkController.setSearchQuery('CAMP');
+      final filtered = linkController.filteredLinks;
+      expect(filtered.length, equals(1));
+      expect(filtered.first.shortCode, equals('campanile'));
+    });
+
+    test('Filter by destination URL substring', () {
+      linkController.setSearchQuery('events.rice.edu');
+      final filtered = linkController.filteredLinks;
+      expect(filtered.length, equals(1));
+      expect(filtered.first.shortCode, equals('fest26'));
+    });
+
+    test('Filter by full short URL', () {
+      linkController.setSearchQuery('link.thejambers.com/campanile');
+      final filtered = linkController.filteredLinks;
+      expect(filtered.length, equals(1));
+      expect(filtered.first.shortCode, equals('campanile'));
+    });
+
+    test('Filter by status (active vs expired)', () {
+      linkController.setStatusFilter(LinkStatusFilter.active);
+      for (final link in linkController.filteredLinks) {
+        expect(link.isEffectivelyActive, isTrue);
+      }
+
+      linkController.setStatusFilter(LinkStatusFilter.expired);
+      for (final link in linkController.filteredLinks) {
+        expect(link.isExpired, isTrue);
+      }
+    });
+
+    test('Clear filters resets search query and status filter', () {
+      linkController.setSearchQuery('fest');
+      linkController.setStatusFilter(LinkStatusFilter.expired);
+      expect(linkController.searchQuery, equals('fest'));
+      expect(linkController.statusFilter, equals(LinkStatusFilter.expired));
+
+      linkController.clearFilters();
+      expect(linkController.searchQuery, isEmpty);
+      expect(linkController.statusFilter, equals(LinkStatusFilter.all));
+      expect(linkController.filteredLinks.length, equals(linkController.allLinks.length));
+    });
+
+    test('Listeners are notified on search and status change', () {
+      int notifyCount = 0;
+      linkController.addListener(() {
+        notifyCount++;
+      });
+
+      linkController.setSearchQuery('owl');
+      expect(notifyCount, equals(1));
+
+      linkController.setStatusFilter(LinkStatusFilter.active);
+      expect(notifyCount, equals(2));
+
+      linkController.clearFilters();
+      expect(notifyCount, equals(3));
     });
   });
 }

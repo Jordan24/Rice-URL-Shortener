@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/rice_colors.dart';
 import '../../state/link_controller.dart';
 
-class LinkSearchBar extends StatelessWidget {
+class LinkSearchBar extends StatefulWidget {
   final String searchQuery;
   final LinkStatusFilter statusFilter;
   final ValueChanged<String> onSearchChanged;
@@ -17,6 +17,36 @@ class LinkSearchBar extends StatelessWidget {
   });
 
   @override
+  State<LinkSearchBar> createState() => _LinkSearchBarState();
+}
+
+class _LinkSearchBarState extends State<LinkSearchBar> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.searchQuery);
+  }
+
+  @override
+  void didUpdateWidget(covariant LinkSearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchQuery != _controller.text) {
+      _controller.text = widget.searchQuery;
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -28,10 +58,21 @@ class LinkSearchBar extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
-                    onChanged: onSearchChanged,
+                    controller: _controller,
+                    onChanged: widget.onSearchChanged,
                     decoration: InputDecoration(
                       hintText: "Search short codes or destination URLs...",
                       prefixIcon: const Icon(Icons.search, color: RiceColors.textSecondary, size: 20),
+                      suffixIcon: widget.searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, color: RiceColors.textSecondary, size: 18),
+                              onPressed: () {
+                                _controller.clear();
+                                widget.onSearchChanged('');
+                              },
+                              tooltip: 'Clear search',
+                            )
+                          : null,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -76,12 +117,12 @@ class LinkSearchBar extends StatelessWidget {
   }
 
   Widget _buildChip(String label, LinkStatusFilter filter) {
-    final isSelected = statusFilter == filter;
+    final isSelected = widget.statusFilter == filter;
 
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
-      onSelected: (_) => onStatusChanged(filter),
+      onSelected: (_) => widget.onStatusChanged(filter),
       selectedColor: RiceColors.riceBlue,
       backgroundColor: Colors.white,
       labelStyle: TextStyle(

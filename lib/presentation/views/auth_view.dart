@@ -114,7 +114,7 @@ class AuthView extends StatelessWidget {
                           ),
                         ],
 
-                        // Sign in button
+                        // Primary Google Sign-in button
                         RiceButton(
                           label: "Sign in with Rice Account",
                           icon: Icons.login_rounded,
@@ -123,6 +123,19 @@ class AuthView extends StatelessWidget {
                           width: double.infinity,
                           onPressed: () => authController.signInWithGoogle(),
                         ),
+
+                        // Explicit Dev Bypass button (only visible in dev mode)
+                        if (authController.isDevMode) ...[
+                          const SizedBox(height: 12),
+                          RiceButton(
+                            label: "Bypass Auth (Dev Mode)",
+                            icon: Icons.developer_mode_rounded,
+                            variant: RiceButtonVariant.secondary,
+                            isLoading: authController.isLoading,
+                            width: double.infinity,
+                            onPressed: () => authController.signInAsDev(),
+                          ),
+                        ],
 
                         const SizedBox(height: 20),
 

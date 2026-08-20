@@ -37,9 +37,10 @@ class LinkController extends ChangeNotifier {
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
         final matchCode = link.shortCode.toLowerCase().contains(query);
+        final matchFullShortUrl = link.fullShortUrl().toLowerCase().contains(query);
         final matchDest = link.destinationUrl.toLowerCase().contains(query);
         final matchFallback = link.fallbackUrl.toLowerCase().contains(query);
-        return matchCode || matchDest || matchFallback;
+        return matchCode || matchFullShortUrl || matchDest || matchFallback;
       }
 
       return true;
@@ -72,6 +73,12 @@ class LinkController extends ChangeNotifier {
 
   void setStatusFilter(LinkStatusFilter filter) {
     _statusFilter = filter;
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    _searchQuery = "";
+    _statusFilter = LinkStatusFilter.all;
     notifyListeners();
   }
 

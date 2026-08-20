@@ -40,7 +40,7 @@ class QrColorSelector extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              final hex = "#${pickerColor.value.toRadixString(16).padLeft(8, '0').toUpperCase()}";
+              final hex = "#${pickerColor.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}";
               onSelected(hex);
               Navigator.pop(ctx);
             },

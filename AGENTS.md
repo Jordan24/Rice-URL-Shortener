@@ -20,7 +20,9 @@
 ## 4. QR CODE ENGINE
 - **Module Shapes**: 3 styles (`square`, `rounded`, `dots`).
 - **Colors**:
-  - Presets: Rice Blue (`#00205B`), Rice Gray (`#7C7E7F`), Dark Blue (`#00143D`), Light Blue (`#4B729F`), Laurel Gold (`#C19B4C`), Black (`#000000`), White (`#FFFFFF`), Transparent background option (`#00000000`).
+  - Presets:
+    - Foreground: Rice Blue (`#00205B`), Rice Gray (`#7C7E7F`), Dark Blue (`#00143D`), Light Blue (`#4B729F`), Laurel Gold (`#C19B4C`), Black (`#000000`).
+    - Background (Light Brand Tones): White (`#FFFFFF`), Off-White (`#F7F7F7`), Light Gray (`#E0E2E6`), Light Blue Gray (`#ADC7DC`), Accent Light Blue (`#CFEEFC`), Transparent (`#00000000`).
   - Custom Color Picker (Hex/RGB). Default: Rice Blue foreground, White background.
 - **Center Logos**: Official Rice marks with quiet zone cutout:
   1. `shield` (Rice University Crest / Shield - Academic)

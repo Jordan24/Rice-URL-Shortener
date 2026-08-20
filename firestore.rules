@@ -18,8 +18,11 @@ service cloud.firestore {
 
     // Links collection
     match /links/{linkId} {
-      // Authenticated Rice users can read their own links or query for availability
-      allow read: if isRiceUser();
+      // Public single-document get allowed for URL redirection lookup
+      allow get: if true;
+
+      // Authenticated Rice users can list/query links in the dashboard
+      allow list: if isRiceUser();
 
       // Rice users can create links owned by themselves
       allow create: if isRiceUser() &&

@@ -32,9 +32,31 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   void initState() {
     super.initState();
+    widget.linkController.addListener(_onLinkControllerChanged);
     final user = widget.authController.currentUser;
     if (user != null) {
       widget.linkController.init(user.uid);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant DashboardView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.linkController != widget.linkController) {
+      oldWidget.linkController.removeListener(_onLinkControllerChanged);
+      widget.linkController.addListener(_onLinkControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.linkController.removeListener(_onLinkControllerChanged);
+    super.dispose();
+  }
+
+  void _onLinkControllerChanged() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -180,7 +202,10 @@ class _DashboardViewState extends State<DashboardView> {
                           ),
                         ),
                       ] else if (links.isEmpty) ...[
-                        _buildEmptyState(),
+                        if (allLinks.isNotEmpty)
+                          _buildSearchEmptyState()
+                        else
+                          _buildEmptyState(),
                       ] else ...[
                         ListView.separated(
                           shrinkWrap: true,
@@ -238,6 +263,51 @@ class _DashboardViewState extends State<DashboardView> {
                   style: GoogleFonts.lato(fontSize: 12, color: RiceColors.textSecondary),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchEmptyState() {
+    return Center(
+      child: RiceCard(
+        padding: const EdgeInsets.all(36),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: RiceColors.textSecondary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.search_off_rounded, size: 36, color: RiceColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "No Matching Links",
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: RiceColors.riceBlue,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "No links matched your search or status filter criteria.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textSecondary),
+            ),
+            const SizedBox(height: 20),
+            RiceButton(
+              label: "Clear Search & Filters",
+              icon: Icons.filter_alt_off_rounded,
+              variant: RiceButtonVariant.outline,
+              onPressed: () {
+                widget.linkController.clearFilters();
+              },
             ),
           ],
         ),

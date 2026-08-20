@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'firebase_options.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/rice_theme.dart';
 import 'data/services/auth_service.dart';
@@ -22,10 +23,16 @@ void main() async {
   FirebaseFirestore? firestore;
 
   try {
-    // Attempt Firebase initialization if options/credentials present
-    await Firebase.initializeApp();
-    firebaseAuth = FirebaseAuth.instance;
-    firestore = FirebaseFirestore.instance;
+    if (!DefaultFirebaseOptions.isPlaceholderConfig) {
+      // Initialize Firebase with platform-specific options
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      firebaseAuth = FirebaseAuth.instance;
+      firestore = FirebaseFirestore.instance;
+    } else {
+      debugPrint("Dev mode: Running with mock data and auth bypass.");
+    }
   } catch (e) {
     debugPrint("Firebase initialized in mock/standalone mode: $e");
   }
