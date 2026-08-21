@@ -24,7 +24,6 @@ secrets.json
 # Firebase & Mobile Credential Files
 google-services.json
 GoogleService-Info.plist
-firebase_options.dart
 
 # Keystores, Certificates, and Private Keys
 *.keystore
