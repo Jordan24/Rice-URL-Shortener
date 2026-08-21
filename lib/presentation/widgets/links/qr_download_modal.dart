@@ -43,20 +43,24 @@ class _QrDownloadModalState extends State<QrDownloadModal> {
     }
   }
 
-  void _downloadSvg() {
+  Future<void> _downloadSvg() async {
     try {
       final targetUrl = widget.link.fullShortUrl();
-      QrExportService.exportSvg(targetUrl, widget.link.qrConfig, widget.link.shortCode);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Downloaded scalable SVG successfully."),
-          backgroundColor: RiceColors.successGreen,
-        ),
-      );
+      await QrExportService.exportSvg(targetUrl, widget.link.qrConfig, widget.link.shortCode);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Downloaded scalable SVG successfully."),
+            backgroundColor: RiceColors.successGreen,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Download failed: $e"), backgroundColor: RiceColors.errorRed),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Download failed: $e"), backgroundColor: RiceColors.errorRed),
+        );
+      }
     }
   }
 

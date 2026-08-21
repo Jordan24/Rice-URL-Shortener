@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr/qr.dart';
+import 'package:rice_url_shortener/core/constants/rice_logos.dart';
 import 'package:rice_url_shortener/core/utils/qr_drawing_helper.dart';
 import 'package:rice_url_shortener/data/models/qr_config.dart';
 import 'package:rice_url_shortener/data/services/qr_export_service.dart';
@@ -72,6 +73,27 @@ void main() {
       expect(svg, contains('<svg'));
       expect(svg, contains('</svg>'));
       expect(svg, contains('<circle'));
+    });
+
+    test('generateSvg with logo embeds base64 image tag', () {
+      const config = QrConfig(style: QrStyle.square, logoType: RiceLogoType.shield);
+      final svg = QrExportService.generateSvg(
+        'https://link.thejambers.com/r/test4',
+        config,
+        logoBase64: 'fakeBase64String123',
+      );
+      expect(svg, contains('<image href="data:image/png;base64,fakeBase64String123"'));
+    });
+
+    test('generatePngBytes produces valid PNG byte buffer', () async {
+      const config = QrConfig(style: QrStyle.rounded, logoType: RiceLogoType.none);
+      final bytes = await QrExportService.generatePngBytes('https://link.thejambers.com/r/test5', config, 256);
+      expect(bytes.isNotEmpty, isTrue);
+      // PNG header magic bytes: 0x89 0x50 0x4E 0x47
+      expect(bytes[0], 0x89);
+      expect(bytes[1], 0x50);
+      expect(bytes[2], 0x4E);
+      expect(bytes[3], 0x47);
     });
   });
 }

@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:qr/qr.dart';
-import '../../core/constants/rice_colors.dart';
 import '../../core/constants/rice_logos.dart';
 import '../../core/utils/qr_drawing_helper.dart';
 import '../../core/utils/web_download_helper.dart';
@@ -15,7 +14,13 @@ class QrExportService {
   static const int defaultQuietZone = 4;
 
   /// Generates a scalable SVG string representation of the QR code with quiet zone padding
-  static String generateSvg(String data, QrConfig config, {int size = 512, int quietZone = defaultQuietZone}) {
+  static String generateSvg(
+    String data,
+    QrConfig config, {
+    int size = 512,
+    int quietZone = defaultQuietZone,
+    String? logoBase64,
+  }) {
     final qrCode = QrCode.fromData(
       data: data,
       errorCorrectLevel: QrErrorCorrectLevel.H,
@@ -59,7 +64,7 @@ class QrExportService {
       alignmentCenters: alignmentCenters,
     );
 
-    // Quiet zone cutout and Center Logo
+    // Quiet zone cutout and Center Logo (embedded PNG)
     if (hasLogo) {
       final logoWidth = centerEnd - centerStart + 1;
       final logoOffset = centerStart.toDouble();
@@ -67,25 +72,10 @@ class QrExportService {
       // Quiet zone background
       buffer.writeln('  <rect x="$logoOffset" y="$logoOffset" width="$logoWidth" height="$logoWidth" rx="1.5" fill="white"/>');
 
-      String logoSvgContent = "";
-      switch (config.logoType) {
-        case RiceLogoType.shield:
-          logoSvgContent = RiceLogos.shieldSvg;
-          break;
-        case RiceLogoType.owl:
-          logoSvgContent = RiceLogos.owlSvg;
-          break;
-        case RiceLogoType.oldEnglishR:
-          logoSvgContent = RiceLogos.oldEnglishRSvg;
-          break;
-        case RiceLogoType.none:
-          break;
-      }
-
-      if (logoSvgContent.isNotEmpty) {
-        buffer.writeln('  <g transform="translate(${logoOffset + 0.5}, ${logoOffset + 0.5}) scale(${(logoWidth - 1) / 100})">');
-        buffer.writeln(logoSvgContent);
-        buffer.writeln('  </g>');
+      final base64Png = logoBase64;
+      if (base64Png != null && base64Png.isNotEmpty) {
+        const pad = 0.5;
+        buffer.writeln('  <image href="data:image/png;base64,$base64Png" x="${logoOffset + pad}" y="${logoOffset + pad}" width="${logoWidth - 2 * pad}" height="${logoWidth - 2 * pad}" preserveAspectRatio="xMidYMid meet"/>');
       }
     }
 
@@ -164,7 +154,7 @@ class QrExportService {
       }
     }
 
-    // Logo Quiet Zone & Drawing
+    // Logo Quiet Zone & PNG image drawing
     if (hasLogo) {
       final logoRect = Rect.fromLTRB(
         centerStart * scale,
@@ -182,8 +172,14 @@ class QrExportService {
         ..strokeWidth = 2;
       canvas.drawRRect(RRect.fromRectAndRadius(logoRect, Radius.circular(scale * 1.5)), quietBorder);
 
-      // Draw vector logo marks
-      _drawLogoOnCanvas(canvas, logoRect.deflate(scale * 0.8), config.logoType);
+      // Draw official Rice logo PNG asset
+      final uiImage = await RiceLogos.getUiImage(config.logoType);
+      if (uiImage != null) {
+        final destRect = logoRect.deflate(scale * 0.7);
+        final srcRect = Rect.fromLTWH(0, 0, uiImage.width.toDouble(), uiImage.height.toDouble());
+        final imagePaint = Paint()..filterQuality = FilterQuality.high;
+        canvas.drawImageRect(uiImage, srcRect, destRect, imagePaint);
+      }
     }
 
     canvas.restore();
@@ -195,107 +191,13 @@ class QrExportService {
     return byteData!.buffer.asUint8List();
   }
 
-  static void _drawLogoOnCanvas(Canvas canvas, Rect bounds, RiceLogoType logoType) {
-    final center = bounds.center;
-    final radius = bounds.width / 2;
-
-    switch (logoType) {
-      case RiceLogoType.shield:
-        final shieldPaint = Paint()..color = RiceColors.riceBlue;
-        final goldPaint = Paint()..color = RiceColors.laurelGold;
-        final whitePaint = Paint()..color = Colors.white;
-
-        final path = Path()
-          ..moveTo(bounds.left + bounds.width * 0.15, bounds.top + bounds.height * 0.1)
-          ..lineTo(bounds.right - bounds.width * 0.15, bounds.top + bounds.height * 0.1)
-          ..lineTo(bounds.right - bounds.width * 0.15, bounds.top + bounds.height * 0.55)
-          ..cubicTo(
-            bounds.right - bounds.width * 0.15,
-            bounds.bottom - bounds.height * 0.1,
-            center.dx,
-            bounds.bottom,
-            center.dx,
-            bounds.bottom,
-          )
-          ..cubicTo(
-            center.dx,
-            bounds.bottom,
-            bounds.left + bounds.width * 0.15,
-            bounds.bottom - bounds.height * 0.1,
-            bounds.left + bounds.width * 0.15,
-            bounds.top + bounds.height * 0.55,
-          )
-          ..close();
-
-        canvas.drawPath(path, shieldPaint);
-        canvas.drawCircle(Offset(center.dx - bounds.width * 0.15, bounds.top + bounds.height * 0.35), bounds.width * 0.08, whitePaint);
-        canvas.drawCircle(Offset(center.dx + bounds.width * 0.15, bounds.top + bounds.height * 0.35), bounds.width * 0.08, whitePaint);
-        
-        final chevron = Path()
-          ..moveTo(center.dx - bounds.width * 0.18, bounds.top + bounds.height * 0.65)
-          ..lineTo(center.dx, bounds.top + bounds.height * 0.52)
-          ..lineTo(center.dx + bounds.width * 0.18, bounds.top + bounds.height * 0.65)
-          ..lineTo(center.dx, bounds.top + bounds.height * 0.78)
-          ..close();
-        canvas.drawPath(chevron, goldPaint);
-        break;
-
-      case RiceLogoType.owl:
-        final owlBody = Paint()..color = RiceColors.riceBlue;
-        final owlEye = Paint()..color = Colors.white;
-        final pupil = Paint()..color = RiceColors.riceBlue;
-        final beak = Paint()..color = RiceColors.laurelGold;
-
-        canvas.drawOval(bounds.deflate(bounds.width * 0.08), owlBody);
-        
-        // Owl eyes
-        final eyeRadius = bounds.width * 0.18;
-        final leftEyeCenter = Offset(center.dx - bounds.width * 0.16, center.dy - bounds.height * 0.1);
-        final rightEyeCenter = Offset(center.dx + bounds.width * 0.16, center.dy - bounds.height * 0.1);
-        
-        canvas.drawCircle(leftEyeCenter, eyeRadius, owlEye);
-        canvas.drawCircle(rightEyeCenter, eyeRadius, owlEye);
-        canvas.drawCircle(leftEyeCenter, eyeRadius * 0.6, pupil);
-        canvas.drawCircle(rightEyeCenter, eyeRadius * 0.6, pupil);
-
-        // Beak
-        final beakPath = Path()
-          ..moveTo(center.dx, center.dy - bounds.height * 0.05)
-          ..lineTo(center.dx - bounds.width * 0.08, center.dy + bounds.height * 0.1)
-          ..lineTo(center.dx + bounds.width * 0.08, center.dy + bounds.height * 0.1)
-          ..close();
-        canvas.drawPath(beakPath, beak);
-        break;
-
-      case RiceLogoType.oldEnglishR:
-        final rCircle = Paint()..color = RiceColors.riceBlue;
-        canvas.drawCircle(center, radius * 0.92, rCircle);
-
-        final textPainter = TextPainter(
-          text: TextSpan(
-            text: "R",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: bounds.height * 0.65,
-              fontWeight: FontWeight.w900,
-              fontFamily: "Georgia",
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-
-        textPainter.paint(canvas, Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2));
-        break;
-
-      case RiceLogoType.none:
-        break;
-    }
-  }
-
   /// Triggers browser download for SVG
-  static void exportSvg(String data, QrConfig config, String shortCode) {
-    final svgString = generateSvg(data, config);
+  static Future<void> exportSvg(String data, QrConfig config, String shortCode) async {
+    String? base64Png;
+    if (config.logoType != RiceLogoType.none) {
+      base64Png = await RiceLogos.getBase64Png(config.logoType);
+    }
+    final svgString = generateSvg(data, config, logoBase64: base64Png);
     WebDownloadHelper.downloadString(svgString, "rice_qr_$shortCode.svg", "image/svg+xml");
   }
 

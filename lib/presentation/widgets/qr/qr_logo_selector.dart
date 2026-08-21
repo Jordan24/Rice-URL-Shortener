@@ -43,21 +43,46 @@ class QrLogoSelector extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: logo == RiceLogoType.none ? Colors.grey.shade100 : RiceColors.riceBlue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            logo == RiceLogoType.none ? Icons.not_interested : Icons.verified_rounded,
-                            size: 16,
-                            color: logo == RiceLogoType.none ? RiceColors.textSecondary : RiceColors.laurelGold,
+                      if (logo == RiceLogoType.none)
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: RiceColors.borderLight),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.block_rounded, size: 16, color: RiceColors.textSecondary),
+                          ),
+                        )
+                      else
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isSelected ? RiceColors.riceBlue : RiceColors.borderLight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 2,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(3),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(3),
+                            child: Image.asset(
+                              RiceLogos.getAssetPath(logo)!,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
-                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -78,10 +103,13 @@ class QrLogoSelector extends StatelessWidget {
                           ],
                         ),
                       ),
+                      // ignore: deprecated_member_use
                       Radio<RiceLogoType>(
                         value: logo,
+                        // ignore: deprecated_member_use
                         groupValue: selectedLogo,
                         activeColor: RiceColors.riceBlue,
+                        // ignore: deprecated_member_use
                         onChanged: (val) {
                           if (val != null) onLogoChanged(val);
                         },

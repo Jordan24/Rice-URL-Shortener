@@ -20,6 +20,20 @@ class QrPreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final qrData = url.isNotEmpty ? url : "https://rice.edu";
+    final qrCode = QrCode.fromData(
+      data: qrData,
+      errorCorrectLevel: QrErrorCorrectLevel.H,
+    );
+    final qrImage = QrImage(qrCode);
+    final moduleCount = qrImage.moduleCount;
+
+    final centerStart = (moduleCount * 0.38).floor();
+    final centerEnd = (moduleCount * 0.62).ceil();
+    final hasLogo = qrConfig.logoType != RiceLogoType.none;
+
+    final logoModules = (centerEnd - centerStart + 1).toDouble();
+    final logoSize = (logoModules / moduleCount) * size;
+    final assetPath = RiceLogos.getAssetPath(qrConfig.logoType);
 
     return Center(
       child: Container(
@@ -40,12 +54,36 @@ class QrPreviewCard extends StatelessWidget {
                   ),
                 ],
         ),
-        child: CustomPaint(
-          size: Size(size, size),
-          painter: _QrCustomPainter(
-            data: qrData,
-            config: qrConfig,
-          ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: Size(size, size),
+              painter: _QrCustomPainter(
+                data: qrData,
+                config: qrConfig,
+              ),
+            ),
+            if (hasLogo && assetPath != null)
+              Container(
+                width: logoSize,
+                height: logoSize,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(logoSize * 0.16),
+                  border: Border.all(
+                    color: qrConfig.fgColor.withValues(alpha: 0.15),
+                    width: 1.5,
+                  ),
+                ),
+                padding: EdgeInsets.all(logoSize * 0.1),
+                child: Image.asset(
+                  assetPath,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -108,123 +146,6 @@ class _QrCustomPainter extends CustomPainter {
           );
         }
       }
-    }
-
-    // Draw Quiet Zone & Logo
-    if (hasLogo) {
-      final logoRect = Rect.fromLTRB(
-        centerStart * scale,
-        centerStart * scale,
-        (centerEnd + 1) * scale,
-        (centerEnd + 1) * scale,
-      );
-
-      final quietPaint = Paint()..color = Colors.white;
-      canvas.drawRRect(RRect.fromRectAndRadius(logoRect, Radius.circular(scale * 1.5)), quietPaint);
-
-      final quietBorder = Paint()
-        ..color = config.fgColor.withValues(alpha: 0.15)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5;
-      canvas.drawRRect(RRect.fromRectAndRadius(logoRect, Radius.circular(scale * 1.5)), quietBorder);
-
-      _drawLogo(canvas, logoRect.deflate(scale * 0.7), config.logoType);
-    }
-  }
-
-  void _drawLogo(Canvas canvas, Rect bounds, RiceLogoType logoType) {
-    final center = bounds.center;
-    final radius = bounds.width / 2;
-
-    switch (logoType) {
-      case RiceLogoType.shield:
-        final shieldPaint = Paint()..color = RiceColors.riceBlue;
-        final goldPaint = Paint()..color = RiceColors.laurelGold;
-        final whitePaint = Paint()..color = Colors.white;
-
-        final path = Path()
-          ..moveTo(bounds.left + bounds.width * 0.15, bounds.top + bounds.height * 0.1)
-          ..lineTo(bounds.right - bounds.width * 0.15, bounds.top + bounds.height * 0.1)
-          ..lineTo(bounds.right - bounds.width * 0.15, bounds.top + bounds.height * 0.55)
-          ..cubicTo(
-            bounds.right - bounds.width * 0.15,
-            bounds.bottom - bounds.height * 0.1,
-            center.dx,
-            bounds.bottom,
-            center.dx,
-            bounds.bottom,
-          )
-          ..cubicTo(
-            center.dx,
-            bounds.bottom,
-            bounds.left + bounds.width * 0.15,
-            bounds.bottom - bounds.height * 0.1,
-            bounds.left + bounds.width * 0.15,
-            bounds.top + bounds.height * 0.55,
-          )
-          ..close();
-
-        canvas.drawPath(path, shieldPaint);
-        canvas.drawCircle(Offset(center.dx - bounds.width * 0.15, bounds.top + bounds.height * 0.35), bounds.width * 0.08, whitePaint);
-        canvas.drawCircle(Offset(center.dx + bounds.width * 0.15, bounds.top + bounds.height * 0.35), bounds.width * 0.08, whitePaint);
-
-        final chevron = Path()
-          ..moveTo(center.dx - bounds.width * 0.18, bounds.top + bounds.height * 0.65)
-          ..lineTo(center.dx, bounds.top + bounds.height * 0.52)
-          ..lineTo(center.dx + bounds.width * 0.18, bounds.top + bounds.height * 0.65)
-          ..lineTo(center.dx, bounds.top + bounds.height * 0.78)
-          ..close();
-        canvas.drawPath(chevron, goldPaint);
-        break;
-
-      case RiceLogoType.owl:
-        final owlBody = Paint()..color = RiceColors.riceBlue;
-        final owlEye = Paint()..color = Colors.white;
-        final pupil = Paint()..color = RiceColors.riceBlue;
-        final beak = Paint()..color = RiceColors.laurelGold;
-
-        canvas.drawOval(bounds.deflate(bounds.width * 0.08), owlBody);
-
-        final eyeRadius = bounds.width * 0.18;
-        final leftEyeCenter = Offset(center.dx - bounds.width * 0.16, center.dy - bounds.height * 0.1);
-        final rightEyeCenter = Offset(center.dx + bounds.width * 0.16, center.dy - bounds.height * 0.1);
-
-        canvas.drawCircle(leftEyeCenter, eyeRadius, owlEye);
-        canvas.drawCircle(rightEyeCenter, eyeRadius, owlEye);
-        canvas.drawCircle(leftEyeCenter, eyeRadius * 0.6, pupil);
-        canvas.drawCircle(rightEyeCenter, eyeRadius * 0.6, pupil);
-
-        final beakPath = Path()
-          ..moveTo(center.dx, center.dy - bounds.height * 0.05)
-          ..lineTo(center.dx - bounds.width * 0.08, center.dy + bounds.height * 0.1)
-          ..lineTo(center.dx + bounds.width * 0.08, center.dy + bounds.height * 0.1)
-          ..close();
-        canvas.drawPath(beakPath, beak);
-        break;
-
-      case RiceLogoType.oldEnglishR:
-        final rCircle = Paint()..color = RiceColors.riceBlue;
-        canvas.drawCircle(center, radius * 0.92, rCircle);
-
-        final textPainter = TextPainter(
-          text: TextSpan(
-            text: "R",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: bounds.height * 0.65,
-              fontWeight: FontWeight.w900,
-              fontFamily: "Georgia",
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-
-        textPainter.paint(canvas, Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2));
-        break;
-
-      case RiceLogoType.none:
-        break;
     }
   }
 
