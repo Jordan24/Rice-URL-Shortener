@@ -4,7 +4,7 @@
 - **Type**: Web-only app (Flutter Web, Dart) + Firebase (Auth, Firestore, Cloud Functions, Hosting).
 - **Domains**: Production `link.thejambers.com`, future migration target `rice.edu`.
 - **Target Platform**: Modern web browsers (Desktop/Tablet/Mobile responsive).
-- **Versions**: Always install & resolve latest stable versions of packages/frameworks.
+- **Versions**: Always install & resolve latest stable versions of packages/frameworks. Keep GitHub Actions versions as configured (e.g., `actions/checkout@v6`).
 
 ## 2. AUTHENTICATION
 - **Provider**: Firebase Google Auth.
