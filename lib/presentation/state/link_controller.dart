@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../data/models/short_link.dart';
-import '../../data/services/firestore_link_service.dart';
+import '../../data/services/link_service.dart';
 
 enum LinkStatusFilter { all, active, expired }
 
 class LinkController extends ChangeNotifier {
-  final FirestoreLinkService _linkService;
+  final LinkService linkService;
   StreamSubscription<List<ShortLink>>? _linksSubscription;
 
   List<ShortLink> _allLinks = [];
@@ -15,7 +15,7 @@ class LinkController extends ChangeNotifier {
   String _searchQuery = "";
   LinkStatusFilter _statusFilter = LinkStatusFilter.all;
 
-  LinkController({required this._linkService});
+  LinkController({required this.linkService});
 
   List<ShortLink> get allLinks => _allLinks;
   bool get isLoading => _isLoading;
@@ -52,7 +52,7 @@ class LinkController extends ChangeNotifier {
     notifyListeners();
 
     _linksSubscription?.cancel();
-    _linksSubscription = _linkService.streamUserLinks(userId).listen(
+    _linksSubscription = linkService.streamUserLinks(userId).listen(
       (links) {
         _allLinks = links;
         _isLoading = false;
@@ -88,7 +88,7 @@ class LinkController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _linkService.createLink(link);
+      await linkService.createLink(link);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -106,7 +106,7 @@ class LinkController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _linkService.updateLink(link);
+      await linkService.updateLink(link);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -120,7 +120,7 @@ class LinkController extends ChangeNotifier {
 
   Future<void> toggleActive(ShortLink link) async {
     try {
-      await _linkService.toggleLinkActive(link.id, link.isActive);
+      await linkService.toggleLinkActive(link.id, link.isActive);
     } catch (e) {
       _errorMessage = e.toString().replaceAll("Exception: ", "");
       notifyListeners();
@@ -129,7 +129,7 @@ class LinkController extends ChangeNotifier {
 
   Future<void> deleteLink(String linkId) async {
     try {
-      await _linkService.deleteLink(linkId);
+      await linkService.deleteLink(linkId);
     } catch (e) {
       _errorMessage = e.toString().replaceAll("Exception: ", "");
       notifyListeners();

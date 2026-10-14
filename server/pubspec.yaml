@@ -1,0 +1,19 @@
+name: rice_url_shortener_server
+description: Serverpod backend for Rice University URL Shortener & QR Studio
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  serverpod: ^2.0.0
+  crypto: ^3.0.3
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  args: ^2.4.2
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
+

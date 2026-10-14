@@ -1,0 +1,15 @@
+class: LinkAnalyticsEvent
+table: link_analytics_event
+fields:
+  linkId: String
+  shortCode: String
+  timestamp: DateTime
+  userAgent: String?
+  referer: String?
+  ipAddress: String?
+indexes:
+  analytics_short_code_idx:
+    fields: shortCode
+  analytics_timestamp_idx:
+    fields: timestamp
+

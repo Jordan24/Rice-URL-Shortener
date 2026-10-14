@@ -125,8 +125,8 @@ void main() {
         updatedAt: DateTime.now(),
       );
 
-      expect(link.fullShortUrl(), equals('https://link.thejambers.com/owl'));
-      expect(link.fullShortUrl('link.thejambers.com'), equals('https://link.thejambers.com/owl'));
+      expect(link.fullShortUrl(), equals('https://go.thejambers.com/owl'));
+      expect(link.fullShortUrl('go.thejambers.com'), equals('https://go.thejambers.com/owl'));
       expect(link.fullShortUrl('rice.edu'), equals('https://rice.edu/owl'));
     });
   });
@@ -163,7 +163,7 @@ void main() {
     });
 
     test('Filter by full short URL', () {
-      linkController.setSearchQuery('link.thejambers.com/campanile');
+      linkController.setSearchQuery('go.thejambers.com/campanile');
       final filtered = linkController.filteredLinks;
       expect(filtered.length, equals(1));
       expect(filtered.first.shortCode, equals('campanile'));

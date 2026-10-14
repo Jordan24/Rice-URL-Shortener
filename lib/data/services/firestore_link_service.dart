@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/short_link.dart';
+import 'link_service.dart';
 
-class FirestoreLinkService {
+class FirestoreLinkService implements LinkService {
   final FirebaseFirestore? _firestore;
   final StreamController<List<ShortLink>> _mockLinksController = StreamController<List<ShortLink>>.broadcast();
   final List<ShortLink> _mockLinks = [];
@@ -45,6 +46,7 @@ class FirestoreLinkService {
   }
 
   /// Checks if a shortcode is already in use
+  @override
   Future<bool> isShortCodeAvailable(String code, {String? excludeLinkId}) async {
     final lowerCode = code.trim().toLowerCase();
     if (AppConstants.reservedRoutes.contains(lowerCode)) {
@@ -65,6 +67,7 @@ class FirestoreLinkService {
   }
 
   /// Stream real-time updates for a given user
+  @override
   Stream<List<ShortLink>> streamUserLinks(String userId) {
     if (_firestore != null) {
       return _firestore
@@ -80,6 +83,7 @@ class FirestoreLinkService {
   }
 
   /// Create a new short link with deterministic document ID to guarantee uniqueness
+  @override
   Future<ShortLink> createLink(ShortLink link) async {
     final code = link.shortCode.trim().toLowerCase();
     final available = await isShortCodeAvailable(code);
@@ -105,6 +109,7 @@ class FirestoreLinkService {
   }
 
   /// Update an existing short link
+  @override
   Future<void> updateLink(ShortLink link) async {
     final code = link.shortCode.trim().toLowerCase();
     final docId = link.id.isNotEmpty ? link.id : code;
@@ -127,6 +132,7 @@ class FirestoreLinkService {
   }
 
   /// Toggle link active status
+  @override
   Future<void> toggleLinkActive(String linkId, bool currentStatus) async {
     if (_firestore != null) {
       await _firestore.collection("links").doc(linkId).update({
@@ -146,6 +152,7 @@ class FirestoreLinkService {
   }
 
   /// Delete a link
+  @override
   Future<void> deleteLink(String linkId) async {
     if (_firestore != null) {
       await _firestore.collection("links").doc(linkId).delete();
@@ -155,6 +162,7 @@ class FirestoreLinkService {
     }
   }
 
+  @override
   void dispose() {
     _mockLinksController.close();
   }

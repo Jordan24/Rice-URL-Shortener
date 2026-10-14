@@ -1,0 +1,7 @@
+class: QrConfigData
+fields:
+  fgColorHex: String, default='#00205B'
+  bgColorHex: String, default='#FFFFFF'
+  style: String, default='square'
+  logoType: String, default='shield'
+

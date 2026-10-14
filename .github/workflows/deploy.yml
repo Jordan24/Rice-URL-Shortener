@@ -1,4 +1,4 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Deploy Unified URL Shortener & Web App (go.thejambers.com)
 
 on:
   push:
@@ -22,23 +22,50 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
+      - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Run tests
+      - name: Run Flutter frontend tests
         run: flutter test
+
+      - name: Run Serverpod backend tests
+        run: |
+          cd server
+          dart pub get
+          dart test
 
       - name: Build Flutter Web
         run: flutter build web --release --base-href "/"
 
       - name: Ensure CNAME and 404.html exist in build output
         run: |
-          cp web/CNAME build/web/CNAME 2>/dev/null || echo "link.thejambers.com" > build/web/CNAME
+          cp web/CNAME build/web/CNAME 2>/dev/null || echo "go.thejambers.com" > build/web/CNAME
           cp web/404.html build/web/404.html 2>/dev/null || true
 
-      - name: Deploy to GitHub Pages
+      - name: Configure AWS Credentials (CloudFront & S3 Deploy)
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Deploy Flutter Web to AWS S3 (CloudFront Origin)
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        run: |
+          S3_BUCKET="${{ secrets.AWS_S3_BUCKET || 'rice-url-shortener-production-frontend' }}"
+          echo "Syncing build/web to s3://${S3_BUCKET}..."
+          aws s3 sync build/web "s3://${S3_BUCKET}" --delete
+
+      - name: Invalidate CloudFront Distribution Cache
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' && secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        run: |
+          echo "Invalidating CloudFront cache for ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}..."
+          aws cloudfront create-invalidation --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"
+
+      - name: Deploy to GitHub Pages (Mirror / Fallback)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
-          cname: link.thejambers.com
+          cname: go.thejambers.com

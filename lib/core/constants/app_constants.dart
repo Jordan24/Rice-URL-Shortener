@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appTitle = "Rice URL Shortener & QR Studio";
-  static const String defaultDomain = "link.thejambers.com";
+  static const String defaultDomain = "go.thejambers.com";
   static const String riceDomain = "rice.edu";
   static const String defaultFallbackUrl = "https://rice.edu";
   static const String allowedAuthDomain = "rice.edu";
@@ -12,7 +12,7 @@ class AppConstants {
   static const int defaultCodeLength = 5;
   static const String allowedSlugRegex = r"^[a-zA-Z0-9_-]{3,30}$";
 
-  // Reserved keywords to prevent collision with application routes & APIs
+  // Reserved keywords to prevent collision with application routes, APIs, and CloudFront origins
   static const Set<String> reservedRoutes = {
     "app",
     "api",
@@ -24,12 +24,19 @@ class AppConstants {
     "admin",
     "assets",
     "favicon",
+    "favicon.ico",
     "manifest",
     "null",
     "undefined",
     "help",
     "about",
     "settings",
+    "health",
+    "metrics",
+    "flutter",
+    "canvaskit",
+    "icons",
+    "version",
   };
 
   // QR resolution options (pixels)

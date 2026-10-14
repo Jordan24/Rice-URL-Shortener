@@ -1,0 +1,26 @@
+class: ShortLinkRecord
+table: short_link
+fields:
+  linkId: String
+  userId: String
+  userEmail: String
+  shortCode: String
+  destinationUrl: String
+  fallbackUrl: String?, default='https://rice.edu'
+  expiresAt: DateTime?
+  isActive: bool, default=true
+  clickCount: int, default=0
+  lastClickedAt: DateTime?
+  createdAt: DateTime
+  updatedAt: DateTime
+  qrConfigJson: String?
+indexes:
+  short_code_unique_idx:
+    fields: shortCode
+    unique: true
+  link_id_unique_idx:
+    fields: linkId
+    unique: true
+  user_id_idx:
+    fields: userId
+

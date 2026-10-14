@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,9 @@ import 'firebase_options.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/rice_theme.dart';
 import 'data/services/auth_service.dart';
+import 'data/services/link_service.dart';
 import 'data/services/firestore_link_service.dart';
+import 'data/services/serverpod_link_service.dart';
 import 'presentation/state/auth_controller.dart';
 import 'presentation/state/link_controller.dart';
 import 'presentation/views/auth_view.dart';
@@ -37,8 +40,20 @@ void main() async {
     debugPrint("Firebase initialized in mock/standalone mode: $e");
   }
 
+  // Active Link Backend selection: Serverpod (AWS Container) or Firestore (Firebase)
+  // Defaults to ServerpodLinkService for AWS architecture compatibility
+  const backendMode = String.fromEnvironment('BACKEND', defaultValue: 'serverpod');
+  const backendUrlEnv = String.fromEnvironment('BACKEND_URL', defaultValue: '');
+  final backendUrl = backendUrlEnv.isNotEmpty
+      ? backendUrlEnv
+      : (kIsWeb && Uri.base.host.isNotEmpty && Uri.base.host != 'localhost' && Uri.base.host != '127.0.0.1'
+          ? Uri.base.origin
+          : 'http://localhost:8081');
+
   final authService = AuthService(firebaseAuth: firebaseAuth);
-  final linkService = FirestoreLinkService(firestore: firestore);
+  final LinkService linkService = backendMode == 'firestore' && firestore != null
+      ? FirestoreLinkService(firestore: firestore)
+      : ServerpodLinkService(backendUrl: backendUrl);
 
   final authController = AuthController(authService: authService);
   final linkController = LinkController(linkService: linkService);

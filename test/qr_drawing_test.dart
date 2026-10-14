@@ -39,7 +39,7 @@ void main() {
   group('QrExportService Generation Tests', () {
     test('generateSvg includes quiet zone in viewBox and translation group', () {
       const config = QrConfig(style: QrStyle.square);
-      const url = 'https://link.thejambers.com/r/test1';
+      const url = 'https://go.thejambers.com/r/test1';
       const quietZone = 4;
       final qrCode = QrCode.fromData(data: url, errorCorrectLevel: QrErrorCorrectLevel.H);
       final totalModules = QrImage(qrCode).moduleCount + (quietZone * 2);
@@ -53,7 +53,7 @@ void main() {
 
     test('generateSvg produces valid SVG for Square style', () {
       const config = QrConfig(style: QrStyle.square);
-      final svg = QrExportService.generateSvg('https://link.thejambers.com/r/test1', config);
+      final svg = QrExportService.generateSvg('https://go.thejambers.com/r/test1', config);
       expect(svg, contains('<svg'));
       expect(svg, contains('</svg>'));
       expect(svg, contains('<rect'));
@@ -61,7 +61,7 @@ void main() {
 
     test('generateSvg produces valid SVG for Rounded style', () {
       const config = QrConfig(style: QrStyle.rounded);
-      final svg = QrExportService.generateSvg('https://link.thejambers.com/r/test2', config);
+      final svg = QrExportService.generateSvg('https://go.thejambers.com/r/test2', config);
       expect(svg, contains('<svg'));
       expect(svg, contains('</svg>'));
       expect(svg, contains('path'));
@@ -69,7 +69,7 @@ void main() {
 
     test('generateSvg produces valid SVG for Dots style', () {
       const config = QrConfig(style: QrStyle.dots);
-      final svg = QrExportService.generateSvg('https://link.thejambers.com/r/test3', config);
+      final svg = QrExportService.generateSvg('https://go.thejambers.com/r/test3', config);
       expect(svg, contains('<svg'));
       expect(svg, contains('</svg>'));
       expect(svg, contains('<circle'));
@@ -78,7 +78,7 @@ void main() {
     test('generateSvg with logo embeds base64 image tag', () {
       const config = QrConfig(style: QrStyle.square, logoType: RiceLogoType.shield);
       final svg = QrExportService.generateSvg(
-        'https://link.thejambers.com/r/test4',
+        'https://go.thejambers.com/r/test4',
         config,
         logoBase64: 'fakeBase64String123',
       );
@@ -87,7 +87,7 @@ void main() {
 
     test('generatePngBytes produces valid PNG byte buffer', () async {
       const config = QrConfig(style: QrStyle.rounded, logoType: RiceLogoType.none);
-      final bytes = await QrExportService.generatePngBytes('https://link.thejambers.com/r/test5', config, 256);
+      final bytes = await QrExportService.generatePngBytes('https://go.thejambers.com/r/test5', config, 256);
       expect(bytes.isNotEmpty, isTrue);
       // PNG header magic bytes: 0x89 0x50 0x4E 0x47
       expect(bytes[0], 0x89);

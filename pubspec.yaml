@@ -47,6 +47,9 @@ dependencies:
   image: ^4.9.2
   web: ^1.1.1
   qr: ^3.0.2
+  http: ^1.2.2
+  rice_url_shortener_client:
+    path: ./client
 
   flutter_web_plugins:
     sdk: flutter

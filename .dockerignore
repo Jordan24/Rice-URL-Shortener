@@ -1,0 +1,16 @@
+.git
+.github
+.idea
+.dart_tool
+build
+build/
+*.log
+.DS_Store
+*.tmp
+.env
+terraform/
+terraform/terraform.tfstate*
+terraform/terraform.tfvars*
+server/config/passwords.yaml
+scripts/
+docs/

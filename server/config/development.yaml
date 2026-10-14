@@ -1,0 +1,31 @@
+# Serverpod Development Configuration
+apiServer:
+  port: 8080
+  publicHost: localhost
+  publicPort: 8080
+  publicScheme: http
+
+insightsServer:
+  port: 8082
+  publicHost: localhost
+  publicPort: 8082
+  publicScheme: http
+
+webServer:
+  port: 8081
+  publicHost: localhost
+  publicPort: 8081
+  publicScheme: http
+
+database:
+  host: localhost
+  port: 5432
+  name: riceshortener
+  user: rice_admin
+
+redis:
+  enabled: true
+  host: localhost
+  port: 6379
+
+maxRequestSize: 5242880

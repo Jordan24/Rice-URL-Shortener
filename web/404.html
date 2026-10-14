@@ -101,9 +101,15 @@
           const destinationUrl = fields.destinationUrl ? fields.destinationUrl.stringValue : null;
           const fallbackUrl = fields.fallbackUrl ? fields.fallbackUrl.stringValue : DEFAULT_FALLBACK;
 
+          function isSafeUrl(url) {
+            return typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'));
+          }
+
+          const targetFallback = isSafeUrl(fallbackUrl) ? fallbackUrl : DEFAULT_FALLBACK;
+
           // Check Active status
           if (!isActive) {
-            window.location.replace(fallbackUrl || DEFAULT_FALLBACK);
+            window.location.replace(targetFallback);
             return;
           }
 
@@ -111,15 +117,15 @@
           if (fields.expiresAt && fields.expiresAt.timestampValue) {
             const expiration = new Date(fields.expiresAt.timestampValue);
             if (expiration < new Date()) {
-              window.location.replace(fallbackUrl || DEFAULT_FALLBACK);
+              window.location.replace(targetFallback);
               return;
             }
           }
 
-          if (destinationUrl) {
+          if (isSafeUrl(destinationUrl)) {
             window.location.replace(destinationUrl);
           } else {
-            window.location.replace(fallbackUrl || DEFAULT_FALLBACK);
+            window.location.replace(targetFallback);
           }
         })
         .catch(function () {

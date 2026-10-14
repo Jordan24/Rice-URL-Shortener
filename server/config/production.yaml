@@ -1,0 +1,31 @@
+# Serverpod Production Configuration
+apiServer:
+  port: 8080
+  publicHost: go.thejambers.com
+  publicPort: 443
+  publicScheme: https
+
+insightsServer:
+  port: 8082
+  publicHost: go.thejambers.com
+  publicPort: 8082
+  publicScheme: http
+
+webServer:
+  port: 8081
+  publicHost: go.thejambers.com
+  publicPort: 443
+  publicScheme: https
+
+database:
+  host: ${SERVERPOD_DATABASE_HOST}
+  port: 5432
+  name: ${SERVERPOD_DATABASE_NAME}
+  user: ${SERVERPOD_DATABASE_USER}
+
+redis:
+  enabled: false
+  host: ${SERVERPOD_REDIS_HOST}
+  port: 6379
+
+maxRequestSize: 5242880

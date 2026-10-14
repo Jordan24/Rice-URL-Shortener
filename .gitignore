@@ -118,3 +118,39 @@ Thumbs.db
 .svn/
 .swiftpm/
 migrate_working_dir/
+
+# ------------------------------------------------------------------------------
+# 6. Terraform State & Files
+# ------------------------------------------------------------------------------
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.plan
+crash.log
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ------------------------------------------------------------------------------
+# 7. Serverpod Secrets, Local Configs & Native Binaries
+# ------------------------------------------------------------------------------
+config/passwords.yaml
+server/config/passwords.yaml
+**/config/passwords.yaml
+!server/config/passwords.yaml.example
+*.local.yaml
+bin/server
+server/bin/server
+
+# ------------------------------------------------------------------------------
+# 8. Database Migration Dumps
+# ------------------------------------------------------------------------------
+firestore_export*.json
+migrated_links*.sql
