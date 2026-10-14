@@ -1,0 +1,40 @@
+# =============================================================================
+# TERRAFORM CONFIGURATION EXAMPLE
+# Copy this file to terraform.tfvars and fill in your values
+# =============================================================================
+
+# AWS Region to deploy resources into
+aws_region = "us-east-1"
+
+# Environment name: production | staging | dev
+environment = "production"
+
+# Project naming prefix
+project_name = "rice-url-shortener"
+
+# -----------------------------------------------------------------------------
+# Configuration A: Testing on Jordan's Domain
+# -----------------------------------------------------------------------------
+domain_name            = "go.thejambers.com"
+create_route53_records = true
+enable_https           = true  # Set to false for initial HTTP-only testing without waiting for SSL cert
+
+# -----------------------------------------------------------------------------
+# Configuration B: Rice University Production Deployment (Handoff Target)
+# Uncomment for Rice deployment:
+# domain_name            = "link.rice.edu"
+# create_route53_records = true
+# -----------------------------------------------------------------------------
+
+# PostgreSQL Database Configuration
+db_name           = "riceshortener"
+db_username       = "rice_admin"
+db_password       = "REPLACE_WITH_SECURE_PASSWORD_16_CHARS"
+db_instance_class = "db.t4g.micro" # Free-tier eligible. Use db.t4g.small for high traffic.
+multi_az_db       = false          # Set to true for high availability failover
+
+# ECS Fargate Backend Container Compute
+backend_cpu    = 512  # 0.5 vCPU
+backend_memory = 1024 # 1 GB RAM
+backend_count  = 2    # Multi-task redundancy across 2 AZs
+
