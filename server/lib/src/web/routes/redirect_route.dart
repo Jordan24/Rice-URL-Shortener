@@ -8,17 +8,27 @@ class RedirectRoute extends Route {
     'app', 'api', 'login', 'auth', 'dashboard', 'static', 'r', 'admin',
     'assets', 'favicon', 'favicon.ico', 'manifest', 'null', 'undefined',
     'help', 'about', 'settings', 'health', 'metrics', 'flutter', 'canvaskit',
-    'icons', 'version',
+    'icons', 'version', 'robots', 'sitemap', 'sitemap.xml',
   };
 
   @override
   Future<bool> handleCall(Session session, HttpRequest request) async {
+    request.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
     final segments = request.uri.pathSegments;
     if (segments.isEmpty) {
       return false;
     }
 
     final code = segments.first.trim().toLowerCase();
+    if (code == 'robots.txt') {
+      request.response.headers.contentType = ContentType.text;
+      request.response.statusCode = HttpStatus.ok;
+      request.response.write('User-agent: *\nDisallow: /api/\nAllow: /\n');
+      await request.response.close();
+      return true;
+    }
+
     if (reservedPaths.contains(code)) {
       return false; // Let subsequent routers or static handlers process
     }

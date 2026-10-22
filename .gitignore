@@ -13,17 +13,12 @@
 *.secret
 *.private
 
-# Service Accounts & GCP / Firebase Credentials
+# Service Accounts & Cloud Credentials
 *serviceAccount*.json
 *service-account*.json
 service_account*.json
-firebase-adminsdk*.json
 private_key.json
 secrets.json
-
-# Firebase & Mobile Credential Files
-google-services.json
-GoogleService-Info.plist
 
 # Keystores, Certificates, and Private Keys
 *.keystore
@@ -39,25 +34,22 @@ key.properties
 local.properties
 
 # ------------------------------------------------------------------------------
-# 2. Firebase & Cloud Functions Artifacts
+# 2. Node & Build Logs
 # ------------------------------------------------------------------------------
 node_modules/
-functions/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-firebase-debug.log*
-firebase-debug.*.log
-firestore-debug.log*
 ui-debug.log*
-functions/.runtimeconfig.json
 .runtimeconfig.json
-firebase-export-*/
 
 # ------------------------------------------------------------------------------
 # 3. Flutter, Dart & Build Artifacts
 # ------------------------------------------------------------------------------
 .dart_tool/
+.dart-tool/
+.config/
+.agents/teamwork/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
@@ -137,6 +129,7 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+terraform/*.zip
 
 # ------------------------------------------------------------------------------
 # 7. Serverpod Secrets, Local Configs & Native Binaries
@@ -152,5 +145,4 @@ server/bin/server
 # ------------------------------------------------------------------------------
 # 8. Database Migration Dumps
 # ------------------------------------------------------------------------------
-firestore_export*.json
 migrated_links*.sql

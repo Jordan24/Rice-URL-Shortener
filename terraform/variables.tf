@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region for provisioning resources"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "environment" {
@@ -36,6 +36,12 @@ variable "enable_https" {
 
 variable "attach_custom_domain" {
   description = "Attach custom domain alias and ACM certificate to CloudFront. Set false on first apply with external DNS (Namecheap) until ACM DNS validation CNAME is created and issued."
+  type        = bool
+  default     = true
+}
+
+variable "allow_search_indexing" {
+  description = "Whether search engines are allowed to index the application. Set false (default) to attach X-Robots-Tag: noindex, nofollow, noarchive headers at the CloudFront edge."
   type        = bool
   default     = false
 }
@@ -98,5 +104,33 @@ variable "redirect_port" {
   description = "Serverpod HTTP redirection and health check port"
   type        = number
   default     = 8081
+}
+
+# =============================================================================
+# SAML 2.0 / SHIBBOLETH SSO VARIABLES (RICE NETID SSO READINESS)
+# =============================================================================
+
+variable "enable_saml_sso" {
+  description = "Enable SAML 2.0 Identity Provider federation for Rice NetID SSO"
+  type        = bool
+  default     = false
+}
+
+variable "saml_provider_name" {
+  description = "SAML Identity Provider name for Rice NetID Shibboleth"
+  type        = string
+  default     = "Rice-NetID-SSO"
+}
+
+variable "saml_metadata_url" {
+  description = "SAML metadata URL for Rice Shibboleth IdP (e.g. https://idp.rice.edu/idp/shibboleth)"
+  type        = string
+  default     = ""
+}
+
+variable "saml_metadata_file" {
+  description = "Optional path to SAML XML metadata file if URL is on internal Rice network"
+  type        = string
+  default     = ""
 }
 

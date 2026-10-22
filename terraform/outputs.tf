@@ -44,3 +44,27 @@ output "acm_validation_records" {
   ] : []
 }
 
+# =============================================================================
+# COGNITO USER POOL OUTPUTS
+# =============================================================================
+
+output "cognito_user_pool_id" {
+  description = "Cognito User Pool ID"
+  value       = aws_cognito_user_pool.pool.id
+}
+
+output "cognito_user_pool_client_id" {
+  description = "Cognito User Pool Web Client ID"
+  value       = aws_cognito_user_pool_client.client.id
+}
+
+output "cognito_user_pool_endpoint" {
+  description = "Cognito User Pool Endpoint"
+  value       = aws_cognito_user_pool.pool.endpoint
+}
+
+output "cognito_region" {
+  description = "AWS Region hosting the Cognito User Pool"
+  value       = var.aws_region
+}
+

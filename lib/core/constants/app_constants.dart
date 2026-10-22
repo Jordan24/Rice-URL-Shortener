@@ -37,6 +37,10 @@ class AppConstants {
     "canvaskit",
     "icons",
     "version",
+    "robots",
+    "robots.txt",
+    "sitemap",
+    "sitemap.xml",
   };
 
   // QR resolution options (pixels)

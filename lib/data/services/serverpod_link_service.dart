@@ -33,8 +33,23 @@ class ServerpodLinkService implements LinkService {
         fallbackUrl: 'https://rice.edu',
         isActive: true,
         clickCount: 142,
+        lastClickedAt: DateTime.now().subtract(const Duration(minutes: 45)),
         createdAt: DateTime.now().subtract(const Duration(days: 2)),
         updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+      ShortLink(
+        id: 'fest26',
+        userId: 'rice_demo_uid_1912',
+        userEmail: 'sammy.owl@rice.edu',
+        shortCode: 'fest26',
+        destinationUrl: 'https://events.rice.edu',
+        fallbackUrl: 'https://rice.edu',
+        expiresAt: DateTime.now().add(const Duration(days: 5)),
+        isActive: true,
+        clickCount: 38,
+        lastClickedAt: DateTime.now().subtract(const Duration(hours: 2)),
+        createdAt: DateTime.now().subtract(const Duration(hours: 6)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 6)),
       ),
     ]);
   }
@@ -88,7 +103,7 @@ class ServerpodLinkService implements LinkService {
     }
 
     try {
-      final payload = link.toMap();
+      final payload = link.toJsonMap();
       payload['shortCode'] = code;
       final createdRecord = await _client.link.createLink(payload);
       final newLink = _recordToShortLink(createdRecord);
@@ -111,7 +126,7 @@ class ServerpodLinkService implements LinkService {
     final linkId = link.id.isNotEmpty ? link.id : code;
 
     try {
-      final payload = link.toMap();
+      final payload = link.toJsonMap();
       payload['id'] = linkId;
       payload['shortCode'] = code;
       await _client.link.updateLink(payload);

@@ -22,6 +22,7 @@ database:
   port: 5432
   name: ${SERVERPOD_DATABASE_NAME}
   user: ${SERVERPOD_DATABASE_USER}
+  requireSsl: true
 
 redis:
   enabled: false

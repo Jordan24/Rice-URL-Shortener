@@ -37,10 +37,11 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release --base-href "/"
 
-      - name: Ensure CNAME and 404.html exist in build output
+      - name: Ensure CNAME, 404.html, and robots.txt exist in build output
         run: |
           cp web/CNAME build/web/CNAME 2>/dev/null || echo "go.thejambers.com" > build/web/CNAME
           cp web/404.html build/web/404.html 2>/dev/null || true
+          cp web/robots.txt build/web/robots.txt 2>/dev/null || true
 
       - name: Configure AWS Credentials (CloudFront & S3 Deploy)
         if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}

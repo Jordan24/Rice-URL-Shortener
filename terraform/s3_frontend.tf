@@ -31,6 +31,20 @@ resource "aws_cloudfront_origin_access_control" "oac" {
   signing_protocol                  = "sigv4"
 }
 
+# CloudFront Response Headers Policy for Search Engine Indexing Control
+resource "aws_cloudfront_response_headers_policy" "robots" {
+  name    = "${var.project_name}-${var.environment}-robots-policy"
+  comment = "Controls X-Robots-Tag header for search engine indexing"
+
+  custom_headers_config {
+    items {
+      header   = "X-Robots-Tag"
+      override = true
+      value    = var.allow_search_indexing ? "index, follow" : "noindex, nofollow, noarchive"
+    }
+  }
+}
+
 # CloudFront Distribution for global unified CDN (Frontend S3 + Serverpod ALB)
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
@@ -66,9 +80,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   # to preserve real-time analytics and instant target changes.
   # ---------------------------------------------------------------------------
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "AlbOrigin"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "AlbOrigin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = true
@@ -92,10 +107,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 1. Backend REST API routes (/api/*)
   ordered_cache_behavior {
-    path_pattern     = "/api/*"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "AlbOrigin"
+    path_pattern               = "/api/*"
+    allowed_methods            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "AlbOrigin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = true
@@ -114,10 +130,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 2. Backend Health check route (/health)
   ordered_cache_behavior {
-    path_pattern     = "/health"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "AlbOrigin"
+    path_pattern               = "/health"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "AlbOrigin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -135,10 +152,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 3. Flutter Web HTML Entry Point (/index.html) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/index.html"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/index.html"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -156,10 +174,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 4. Flutter Web Engine & JS Bundles (/flutter* & /main.dart.js*) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/flutter*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/flutter*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -176,10 +195,11 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   ordered_cache_behavior {
-    path_pattern     = "/main.dart*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/main.dart*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -197,10 +217,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 5. Flutter Web Static Assets (/assets/*) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/assets/*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/assets/*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -218,10 +239,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 6. CanvasKit WebAssembly Engine (/canvaskit/*) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/canvaskit/*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/canvaskit/*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -239,10 +261,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 7. App Icons (/icons/*) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/icons/*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/icons/*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -260,10 +283,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 8. Web App Manifest (/manifest.json) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/manifest.json"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/manifest.json"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -281,10 +305,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 9. Favicon & Web Icons (/favicon*) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/favicon*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/favicon*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -302,10 +327,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 10. Version File (/version.json) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/version.json"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/version.json"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -323,10 +349,11 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 11. Flutter SPA Navigation Routes (/app*, /dashboard*, /login*) -> S3 (SPA fallback to index.html)
   ordered_cache_behavior {
-    path_pattern     = "/app*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/app*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -343,10 +370,11 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   ordered_cache_behavior {
-    path_pattern     = "/dashboard*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/dashboard*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -363,10 +391,11 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   ordered_cache_behavior {
-    path_pattern     = "/login*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/login*"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false
@@ -384,10 +413,33 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   # 12. Static 404 Error Page (/404.html) -> S3
   ordered_cache_behavior {
-    path_pattern     = "/404.html"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3Origin"
+    path_pattern               = "/404.html"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+  }
+
+  # 13. Search Engine Crawler Instructions (/robots.txt) -> S3
+  ordered_cache_behavior {
+    path_pattern               = "/robots.txt"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3Origin"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.robots.id
 
     forwarded_values {
       query_string = false

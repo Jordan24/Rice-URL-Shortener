@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_constants.dart';
 import 'qr_config.dart';
 
@@ -74,7 +73,11 @@ class ShortLink {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() => toJsonMap();
+
+  /// Serializes the ShortLink to a JSON-compatible Map with ISO-8601 date strings
+  /// for Serverpod JSON RPC communication.
+  Map<String, dynamic> toJsonMap() {
     return {
       'id': id,
       'userId': userId,
@@ -82,31 +85,26 @@ class ShortLink {
       'shortCode': shortCode.toLowerCase(),
       'destinationUrl': destinationUrl,
       'fallbackUrl': fallbackUrl,
-      'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
+      'expiresAt': expiresAt?.toIso8601String(),
       'isActive': isActive,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       'qrConfig': qrConfig.toMap(),
       'clickCount': clickCount,
-      'lastClickedAt': lastClickedAt != null ? Timestamp.fromDate(lastClickedAt!) : null,
+      'lastClickedAt': lastClickedAt?.toIso8601String(),
     };
-  }
-
-  factory ShortLink.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>? ?? {};
-    return ShortLink.fromMap(data, id: doc.id);
   }
 
   factory ShortLink.fromMap(Map<String, dynamic> map, {String? id}) {
     DateTime parseDate(dynamic val, DateTime fallback) {
-      if (val is Timestamp) return val.toDate();
+      if (val is DateTime) return val;
       if (val is String) return DateTime.tryParse(val) ?? fallback;
       return fallback;
     }
 
     DateTime? parseNullableDate(dynamic val) {
       if (val == null) return null;
-      if (val is Timestamp) return val.toDate();
+      if (val is DateTime) return val;
       if (val is String) return DateTime.tryParse(val);
       return null;
     }

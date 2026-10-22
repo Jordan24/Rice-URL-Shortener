@@ -108,10 +108,13 @@ class QrColorSelector extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+              ),
             ),
+            const SizedBox(width: 8),
             Text(
               normCurrent,
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: RiceColors.textSecondary),

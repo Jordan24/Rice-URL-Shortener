@@ -136,8 +136,9 @@ Runs our containerized Serverpod backend:
 - Implements the **Option 2 Unified Domain Strategy** (`go.thejambers.com`).
 - Stores the compiled Flutter Web frontend in an Amazon S3 bucket.
 - Configures **AWS CloudFront** as the single unified entry point:
-  - Routes `/` and static assets (`/assets/*`, `/canvaskit/*`, `/icons/*`, `*.js`, `*.wasm`, etc.) to the S3 bucket.
+  - Routes `/` and static assets (`/assets/*`, `/canvaskit/*`, `/icons/*`, `/robots.txt`, `*.js`, `*.wasm`, etc.) to the S3 bucket.
   - Routes `/*` (shortened redirect URLs) and `/api/*` (REST APIs) dynamically to the Serverpod ALB.
+- Attaches a **CloudFront Response Headers Policy** (`X-Robots-Tag: noindex, nofollow, noarchive` when `allow_search_indexing = false`) to prevent search engine indexing of demo environments and redirect routes.
 - Configures custom 404 error responses so Flutter Web's HTML5 client-side routing works seamlessly when refreshing links.
 
 ---

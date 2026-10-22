@@ -32,6 +32,7 @@ The **Rice URL Shortener & QR Studio** is an enterprise-grade web application en
 | **Phase 5** | Container Image Build & ECR Push | DevOps / Engineering | 15 minutes |
 | **Phase 6** | Static Frontend Deployment (CloudFront/S3) | DevOps / Engineering | 10 minutes |
 | **Phase 7** | Data Migration & Verification | Engineering & OIT | 30 minutes |
+| **Phase 8** | Search Engine Indexing Policy (`noindex` vs. Public) | Rice OIT / Communications | 5 minutes |
 
 ---
 
@@ -53,17 +54,18 @@ The entire infrastructure resides in the `terraform/` directory.
    ```
 3. Update `terraform.tfvars` with Rice parameters:
    ```hcl
-   aws_region          = "us-east-1"
-   environment         = "production"
-   project_name        = "rice-url-shortener"
-   domain_name         = "link.rice.edu" # or go.rice.edu
-   db_name             = "riceshortener"
-   db_username         = "rice_admin"
-   db_password         = "YOUR_SECURE_GENERATED_PASSWORD"
-   db_instance_class   = "db.t4g.micro" # or db.t4g.small for high traffic
-   backend_cpu         = 512
-   backend_memory      = 1024
-   backend_count       = 2 # Multi-task redundancy
+   aws_region            = "us-east-1"
+   environment           = "production"
+   project_name          = "rice-url-shortener"
+   domain_name           = "link.rice.edu" # or go.rice.edu
+   allow_search_indexing = false           # Keep false for internal utility, or set true if public indexing is desired
+   db_name               = "riceshortener"
+   db_username           = "rice_admin"
+   db_password           = "YOUR_SECURE_GENERATED_PASSWORD"
+   db_instance_class     = "db.t4g.micro" # or db.t4g.small for high traffic
+   backend_cpu           = 512
+   backend_memory        = 1024
+   backend_count         = 2 # Multi-task redundancy
    ```
 4. Initialize and apply:
    ```bash
@@ -83,13 +85,12 @@ The entire infrastructure resides in the `terraform/` directory.
 3. SSL certificates are provisioned automatically via AWS Certificate Manager (ACM) in `us-east-1` with automatic annual renewal.
 
 ### Phase 4: Rice NetID / SSO Integration
-Currently, the application supports Google OAuth restricted to `@rice.edu` domains. To integrate Rice NetID SSO:
+Currently, the application uses AWS Cognito User Pools with native email/password + OTP verification restricted to `@rice.edu` domains via client-side validation and a Cognito `PreSignUp` Lambda trigger (`terraform/cognito.tf`). To integrate Rice NetID SSO:
 
-1. **Option A: Google Workspace for Education (Zero-Code Switch)**:
-   - Rice University Google accounts use NetID single sign-on automatically.
-   - Ensure the Google OAuth client ID is registered in Rice's Google Cloud console.
-2. **Option B: SAML 2.0 / Shibboleth (Enterprise SSO)**:
-   - Configure Rice's Shibboleth IdP entity ID: `https://idp.rice.edu/idp/shibboleth`.
+1. **Option A: AWS Cognito SAML 2.0 / OIDC Federation (Zero-Code Switch)**:
+   - Provide Rice's Shibboleth IdP metadata URL (`https://idp.rice.edu/idp/shibboleth`) or OIDC issuer in `terraform.tfvars` (`saml_metadata_url` / `oidc_issuer_url`).
+   - Run `terraform apply` to federate Rice NetID directly with the Cognito User Pool.
+2. **Option B: Direct SAML 2.0 / Shibboleth Integration**:
    - Update the backend authentication middleware in `server/lib/src/auth/` or frontend `AuthService` in `lib/data/services/auth_service.dart`.
    - Map SAML assertions: `netid` -> `userId`, `mail` -> `userEmail`, `displayName` -> `displayName`.
 
@@ -128,9 +129,21 @@ Currently, the application supports Google OAuth restricted to `@rice.edu` domai
 
 ### Phase 7: Database Migration & Schema
 The database tables are defined in `server/migrations/initial_schema.sql`.
-1. The containerized backend runs migrations automatically on startup.
-2. If migrating links from the temporary staging database or Firebase Firestore:
-   - Run the included migration script: `dart run scripts/migrate_firestore_to_postgres.dart`.
+1. The containerized backend runs schema initialization automatically on startup.
+2. If migrating links from a staging PostgreSQL RDS database, use `pg_dump` / `pg_restore` or AWS Database Migration Service (DMS).
+
+### Phase 8: Search Engine Indexing Policy (`noindex` vs. Public Search)
+By default, the application is configured to **prevent search engine indexing** (`noindex, nofollow, noarchive`) so the staging/demo deployment (`go.thejambers.com`), authenticated administrative views, and individual short-link redirects are not publicly searchable on Google or Bing:
+- **HTML Meta Tags**: `web/index.html` and `web/404.html` include `<meta name="robots" content="noindex, nofollow, noarchive">` and `<meta name="googlebot" content="noindex, nofollow, noarchive">`.
+- **CloudFront Edge Headers**: `terraform/s3_frontend.tf` provisions `aws_cloudfront_response_headers_policy.robots` controlled by `var.allow_search_indexing` (defaults to `false`, emitting `X-Robots-Tag: noindex, nofollow, noarchive` on all CDN responses).
+- **Serverpod Redirect & API Routes**: `RedirectRoute`, `ApiRoute`, and `HealthRoute` always set `X-Robots-Tag: noindex, nofollow, noarchive` so shortened URL redirects (`/:code`) and API endpoints are never indexed as standalone search results.
+- **Crawler Access (`web/robots.txt`)**: `robots.txt` is routed to S3 (with a fallback handler in `RedirectRoute`) and permits crawler access (`Allow: /`, `Disallow: /api/`) so search engine bots can read the `noindex` directives and drop any previously cached URLs.
+
+**Options for Rice University OIT upon Handoff**:
+1. **Keep Non-Searchable (Recommended for Internal Institutional Utility)**: Leave `allow_search_indexing = false` in `terraform.tfvars` and keep the `noindex` meta tags in `web/index.html`.
+2. **Enable Public Search Indexing for the Landing Page**: If Rice Institutional Communications wants `link.rice.edu` / `go.rice.edu` to appear in search engines:
+   - Set `allow_search_indexing = true` in `terraform/terraform.tfvars` and run `terraform apply`.
+   - Update `<meta name="robots">` and `<meta name="googlebot">` in `web/index.html` to `content="index, follow"`, then rebuild and sync `build/web/` to S3. (Individual short-link redirects handled by `RedirectRoute` will continue sending `X-Robots-Tag: noindex, nofollow, noarchive`.)
 
 ---
 

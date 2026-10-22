@@ -160,7 +160,7 @@ To hand off this project to Rice University Office of Information Technology (OI
 ├── docker-compose.yml         # Local orchestration (PostgreSQL + Redis + Serverpod)
 ├── lib/                       # Flutter Web frontend
 │   ├── core/                  # Constants (Rice colors, logos), theme, utils, QR drawing
-│   ├── data/                  # ShortLink model, AuthService, Firestore & Serverpod services
+│   ├── data/                  # ShortLink model, AuthService (AWS Cognito), Serverpod link service
 │   └── presentation/          # Views (Auth, Dashboard, 404), State controllers, Modal widgets
 ├── server/                    # Serverpod Dart backend
 │   ├── bin/                   # Entry point (main.dart)

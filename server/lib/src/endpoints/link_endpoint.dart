@@ -7,7 +7,7 @@ class LinkEndpoint extends Endpoint {
     'app', 'api', 'login', 'auth', 'dashboard', 'static', 'r', 'admin',
     'assets', 'favicon', 'favicon.ico', 'manifest', 'null', 'undefined',
     'help', 'about', 'settings', 'health', 'metrics', 'flutter', 'canvaskit',
-    'icons', 'version',
+    'icons', 'version', 'robots', 'robots.txt', 'sitemap', 'sitemap.xml',
   };
 
   /// Check whether a shortcode is valid and available

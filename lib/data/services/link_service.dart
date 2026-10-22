@@ -2,7 +2,7 @@ import '../models/short_link.dart';
 
 /// Abstract service interface for link management operations.
 /// Decouples UI controllers from the specific backend provider
-/// (AWS Serverpod vs. Firebase Firestore).
+/// (AWS Serverpod / PostgreSQL).
 abstract class LinkService {
   /// Checks whether a short code is available and valid
   Future<bool> isShortCodeAvailable(String code, {String? excludeLinkId});

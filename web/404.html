@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="googlebot" content="noindex, nofollow, noarchive">
   <title>Redirecting | Rice University Link Shortener</title>
   <meta name="theme-color" content="#00205B">
   <style>
@@ -78,61 +80,10 @@
         return;
       }
 
-      // Read Firebase Project ID from meta or window config if present, or fallback
-      const projectId = window.FIREBASE_PROJECT_ID || "rice-url-shortener";
-      const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/links/${encodeURIComponent(code)}`;
-
-      // Execute high-speed Firestore REST lookup
-      fetch(firestoreUrl)
-        .then(function (res) {
-          if (!res.ok) {
-            throw new Error("Link not found");
-          }
-          return res.json();
-        })
-        .then(function (doc) {
-          if (!doc || !doc.fields) {
-            window.location.replace(DEFAULT_FALLBACK);
-            return;
-          }
-
-          const fields = doc.fields;
-          const isActive = fields.isActive ? fields.isActive.booleanValue !== false : true;
-          const destinationUrl = fields.destinationUrl ? fields.destinationUrl.stringValue : null;
-          const fallbackUrl = fields.fallbackUrl ? fields.fallbackUrl.stringValue : DEFAULT_FALLBACK;
-
-          function isSafeUrl(url) {
-            return typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'));
-          }
-
-          const targetFallback = isSafeUrl(fallbackUrl) ? fallbackUrl : DEFAULT_FALLBACK;
-
-          // Check Active status
-          if (!isActive) {
-            window.location.replace(targetFallback);
-            return;
-          }
-
-          // Check Expiration
-          if (fields.expiresAt && fields.expiresAt.timestampValue) {
-            const expiration = new Date(fields.expiresAt.timestampValue);
-            if (expiration < new Date()) {
-              window.location.replace(targetFallback);
-              return;
-            }
-          }
-
-          if (isSafeUrl(destinationUrl)) {
-            window.location.replace(destinationUrl);
-          } else {
-            window.location.replace(targetFallback);
-          }
-        })
-        .catch(function () {
-          // If not found or network error, hand over to Flutter NotFound view or fallback
-          sessionStorage.setItem("spa_redirect", window.location.href);
-          window.location.replace("/");
-        });
+      // Short link redirection is handled at the edge by AWS CloudFront -> ALB -> Serverpod.
+      // If static fallback 404.html is reached directly, hand over to Flutter SPA NotFoundView.
+      sessionStorage.setItem("spa_redirect", window.location.href);
+      window.location.replace("/");
     })();
   </script>
 </body>

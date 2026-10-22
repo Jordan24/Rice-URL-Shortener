@@ -5,16 +5,15 @@ FROM dart:stable AS build
 
 WORKDIR /app
 
-# Copy dependency specifications first for Docker layer caching
-COPY server/pubspec.* ./server/
-COPY client/pubspec.* ./client/
-
-WORKDIR /app/server
-RUN dart pub get
-
 # Copy source trees
 COPY server/ /app/server/
 COPY client/ /app/client/
+
+# Clean host-specific .dart_tool and build directories so container resolves fresh in Linux
+RUN rm -rf /app/server/.dart_tool /app/client/.dart_tool /app/server/build /app/client/build
+
+WORKDIR /app/server
+RUN dart pub get
 
 # Compile native AOT binary
 RUN dart compile exe bin/main.dart -o bin/server
@@ -38,6 +37,7 @@ WORKDIR /app
 # Copy compiled binary and configuration
 COPY --from=build --chown=riceuser:riceuser /app/server/bin/server /app/bin/server
 COPY --from=build --chown=riceuser:riceuser /app/server/config/ /app/config/
+COPY --from=build --chown=riceuser:riceuser /app/server/migrations/ /app/migrations/
 
 USER riceuser
 

@@ -18,12 +18,14 @@ project_name = "rice-url-shortener"
 domain_name            = "go.thejambers.com"
 create_route53_records = true
 enable_https           = true  # Set to false for initial HTTP-only testing without waiting for SSL cert
+allow_search_indexing  = false # Keep false to prevent search engines from indexing demo/internal utility
 
 # -----------------------------------------------------------------------------
 # Configuration B: Rice University Production Deployment (Handoff Target)
 # Uncomment for Rice deployment:
 # domain_name            = "link.rice.edu"
 # create_route53_records = true
+# allow_search_indexing  = false # Set true only if Rice OIT wants public search indexing
 # -----------------------------------------------------------------------------
 
 # PostgreSQL Database Configuration

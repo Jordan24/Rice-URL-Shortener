@@ -13,6 +13,7 @@ import '../widgets/links/edit_link_modal.dart';
 import '../widgets/links/link_search_bar.dart';
 import '../widgets/links/link_table_row.dart';
 import '../widgets/links/qr_download_modal.dart';
+import '../widgets/qr/standalone_qr_modal.dart';
 
 class DashboardView extends StatefulWidget {
   final AuthController authController;
@@ -68,6 +69,14 @@ class _DashboardViewState extends State<DashboardView> {
         authController: widget.authController,
         linkController: widget.linkController,
       ),
+    );
+  }
+
+  void _openStandaloneQrModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const StandaloneQrModal(),
     );
   }
 
@@ -128,6 +137,7 @@ class _DashboardViewState extends State<DashboardView> {
       appBar: RiceHeader(
         authController: widget.authController,
         onCreateLinkPressed: _openCreateModal,
+        onCreateQrPressed: _openStandaloneQrModal,
       ),
       body: Column(
         children: [
@@ -346,11 +356,24 @@ class _DashboardViewState extends State<DashboardView> {
               style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textSecondary),
             ),
             const SizedBox(height: 24),
-            RiceButton(
-              label: "Create Short Link",
-              icon: Icons.add_rounded,
-              variant: RiceButtonVariant.primary,
-              onPressed: _openCreateModal,
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                RiceButton(
+                  label: "Create Short Link",
+                  icon: Icons.add_rounded,
+                  variant: RiceButtonVariant.primary,
+                  onPressed: _openCreateModal,
+                ),
+                RiceButton(
+                  label: "Create QR Code",
+                  icon: Icons.qr_code_2_rounded,
+                  variant: RiceButtonVariant.outline,
+                  onPressed: _openStandaloneQrModal,
+                ),
+              ],
             ),
           ],
         ),

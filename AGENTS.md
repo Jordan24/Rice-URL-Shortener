@@ -1,7 +1,7 @@
 # PROJECT CONTEXT: RICE UNIVERSITY URL SHORTENER & QR STUDIO
 
 ## 1. SPECS & ENV
-- **Type**: Web-only app (Flutter Web, Dart) + Serverpod Dart Backend in Docker + AWS Infrastructure (Terraform) with Firebase transition compatibility.
+- **Type**: Web-only app (Flutter Web, Dart) + Serverpod Dart Backend in Docker + AWS Infrastructure (Terraform).
 - **Domains**: 
   - Development & Testing: `go.thejambers.com` (Unified CloudFront CDN fronting S3 & ECS Serverpod ALB).
   - Target Institutional Domain: Rice University `rice.edu` (e.g., `link.rice.edu` or `go.rice.edu`).
@@ -14,9 +14,9 @@
   - GitHub Actions: Keep pinned actions (e.g., `actions/checkout@v6`).
 
 ## 2. AUTHENTICATION & INSTITUTIONAL SSO
-- **Current Mode**: Firebase Google Auth with strict restriction to `@rice.edu` email domains (non-Rice accounts rejected with feedback).
-- **Institutional Target**: Rice University Single Sign-On (SSO) via SAML 2.0, Shibboleth, or OpenID Connect (OIDC) tied to Rice NetID / OIT Identity Provider (IdP).
-- **Architecture**: Auth service interface abstraction (`AuthService`) decoupling UI from auth provider, allowing plug-and-play migration between Google OAuth and Rice NetID SSO.
+- **Current Mode**: AWS Cognito User Pool with strict client-side and server-side (`PreSignUp` Lambda trigger) restriction to `@rice.edu` email domains (non-Rice accounts rejected with feedback).
+- **Institutional Target**: Rice University Single Sign-On (SSO) via SAML 2.0, Shibboleth, or OpenID Connect (OIDC) tied to Rice NetID / OIT Identity Provider (IdP) federated with AWS Cognito.
+- **Architecture**: Auth service abstraction (`AuthService`) decoupling UI from auth provider, allowing plug-and-play migration to Rice NetID SSO.
 
 ## 3. LINK SHORTENING & REDIRECTION
 - **Shortcode**: Default 5-char alphanumeric (case-insensitive base36/base62 lowercase-normalized).
@@ -57,39 +57,16 @@
 - **SRP & DRY**: Every file <150-200 lines. Single dedicated responsibility.
 - **Directory Structure**:
   - `lib/core/` (constants, theme, utils, web downloads)
-  - `lib/data/` (models, services: auth, link_service interface, firestore, serverpod adapter, qr export)
+  - `lib/data/` (models, services: auth, link_service interface, serverpod adapter, qr export)
   - `lib/presentation/` (state controllers, widgets: common, qr, links, views: auth, dashboard, 404)
   - `server/` (Serverpod Dart backend: models, endpoints, web redirect routes, config)
   - `client/` (Serverpod client library for Dart/Flutter)
-  - `terraform/` (Infrastructure as Code for AWS: VPC, ECS Fargate, RDS PostgreSQL, ALB, Route53, ACM, S3/CloudFront)
+  - `terraform/` (Infrastructure as Code for AWS: VPC, ECS Fargate, RDS PostgreSQL, ALB, Route53, ACM, S3/CloudFront, Cognito)
   - `docs/` (Transfer guide, Terraform tutorial, Docker guide, AWS setup guide)
   - `web/` (index.html, manifest, assets, CNAME)
 - **Routing**: Flutter Web HTML5 path URL strategy (no `#` hash routing).
 
 ## 7. DATA SCHEMAS
-### Firestore Schema (Legacy / Fallback):
-```json
-// Collection: links/{linkId}
-{
-  "id": "string",
-  "userId": "string",
-  "userEmail": "string",
-  "shortCode": "string (lowercase)",
-  "destinationUrl": "string",
-  "fallbackUrl": "string (default: https://rice.edu)",
-  "expiresAt": "Timestamp | null",
-  "isActive": true,
-  "createdAt": "Timestamp",
-  "updatedAt": "Timestamp",
-  "qrConfig": {
-    "fgColorHex": "#00205B",
-    "bgColorHex": "#FFFFFF",
-    "style": "square | rounded | dots",
-    "logoType": "shield | owl | old_english_r | none"
-  }
-}
-```
-
 ### Serverpod / PostgreSQL Relational Schema:
 ```sql
 -- Table: short_link

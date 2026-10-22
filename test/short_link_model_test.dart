@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rice_url_shortener/core/constants/rice_logos.dart';
 import 'package:rice_url_shortener/data/models/qr_config.dart';
 import 'package:rice_url_shortener/data/models/short_link.dart';
-import 'package:rice_url_shortener/data/services/firestore_link_service.dart';
+import 'package:rice_url_shortener/data/services/serverpod_link_service.dart';
 import 'package:rice_url_shortener/presentation/state/link_controller.dart';
 
 void main() {
@@ -132,14 +132,14 @@ void main() {
   });
 
   group('LinkController Search and Filtering Tests', () {
-    late FirestoreLinkService linkService;
+    late ServerpodLinkService linkService;
     late LinkController linkController;
 
     setUp(() async {
-      linkService = FirestoreLinkService(firestore: null);
+      linkService = ServerpodLinkService();
       linkController = LinkController(linkService: linkService);
       linkController.init('rice_demo_uid_1912');
-      // Wait for mock links to populate
+      // Wait for cached links to populate
       await Future.delayed(Duration.zero);
     });
 

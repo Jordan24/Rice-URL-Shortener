@@ -6,11 +6,13 @@ import '../../state/auth_controller.dart';
 class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
   final AuthController authController;
   final VoidCallback? onCreateLinkPressed;
+  final VoidCallback? onCreateQrPressed;
 
   const RiceHeader({
     super.key,
     required this.authController,
     this.onCreateLinkPressed,
+    this.onCreateQrPressed,
   });
 
   @override
@@ -73,6 +75,23 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
 
           // Actions
           if (authController.isAuthenticated) ...[
+            if (onCreateQrPressed != null) ...[
+              OutlinedButton.icon(
+                onPressed: onCreateQrPressed,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: RiceColors.white,
+                  side: BorderSide(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                ),
+                icon: const Icon(Icons.qr_code_2_rounded, size: 19, color: RiceColors.laurelGold),
+                label: const Text(
+                  "Create QR Code",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
             if (onCreateLinkPressed != null)
               ElevatedButton.icon(
                 onPressed: onCreateLinkPressed,

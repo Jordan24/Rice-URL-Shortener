@@ -144,5 +144,6 @@ class ApiRoute extends Route {
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   }
 }
