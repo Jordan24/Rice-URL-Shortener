@@ -1,0 +1,6 @@
+# Allow crawlers to fetch pages so they can read the noindex meta tags and X-Robots-Tag HTTP headers.
+# Note: Do not set "Disallow: /" while de-indexing an already-indexed domain, otherwise crawlers
+# cannot inspect the page to observe the noindex directive.
+User-agent: *
+Disallow: /api/
+Allow: /
