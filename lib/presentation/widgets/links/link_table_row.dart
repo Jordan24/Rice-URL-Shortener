@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../data/models/short_link.dart';
 import '../common/rice_card.dart';
@@ -55,7 +55,7 @@ class LinkTableRow extends StatelessWidget {
                     Expanded(
                       child: SelectableText(
                         shortUrl,
-                        style: GoogleFonts.lato(
+                        style: RiceTheme.body(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: RiceColors.riceBlue,
@@ -70,7 +70,7 @@ class LinkTableRow extends StatelessWidget {
                   link.destinationUrl,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, color: RiceColors.textSecondary),
+                  style: RiceTheme.body(fontSize: 13, color: RiceColors.textSecondary),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -80,7 +80,7 @@ class LinkTableRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         DateFormatter.formatRelativeExpiration(link.expiresAt),
-                        style: const TextStyle(fontSize: 12, color: RiceColors.textSecondary),
+                        style: RiceTheme.body(fontSize: 12, color: RiceColors.textSecondary),
                       ),
                     ),
                   ],
@@ -91,7 +91,7 @@ class LinkTableRow extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Text("Active", style: TextStyle(fontSize: 12)),
+                        Text("Active", style: RiceTheme.body(fontSize: 12, color: RiceColors.textPrimary)),
                         Switch(
                           value: link.isActive,
                           activeThumbColor: RiceColors.riceBlue,
@@ -119,7 +119,7 @@ class LinkTableRow extends StatelessWidget {
                       children: [
                         SelectableText(
                           shortUrl,
-                          style: GoogleFonts.lato(
+                          style: RiceTheme.body(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: RiceColors.riceBlue,
@@ -136,7 +136,7 @@ class LinkTableRow extends StatelessWidget {
                       link.destinationUrl,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, color: RiceColors.textSecondary),
+                      style: RiceTheme.body(fontSize: 13, color: RiceColors.textSecondary),
                     ),
                   ],
                 ),
@@ -150,7 +150,7 @@ class LinkTableRow extends StatelessWidget {
                   children: [
                     Text(
                       DateFormatter.formatRelativeExpiration(link.expiresAt),
-                      style: TextStyle(
+                      style: RiceTheme.body(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: isExpired ? RiceColors.errorRed : RiceColors.textPrimary,
@@ -161,7 +161,7 @@ class LinkTableRow extends StatelessWidget {
                         "Fallback: ${link.fallbackUrl}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, color: RiceColors.textSecondary),
+                        style: RiceTheme.body(fontSize: 11, color: RiceColors.textSecondary),
                       ),
                   ],
                 ),
@@ -203,9 +203,9 @@ class LinkTableRow extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             "${link.clickCount} ${link.clickCount == 1 ? 'click' : 'clicks'}",
-            style: const TextStyle(
+            style: RiceTheme.body(
               fontSize: 11,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
               color: RiceColors.riceBlue,
             ),
           ),
@@ -241,7 +241,7 @@ class LinkTableRow extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.bold),
+        style: RiceTheme.body(color: fg, fontSize: 11, fontWeight: FontWeight.w700),
       ),
     );
   }

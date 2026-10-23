@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/rice_colors.dart';
+import '../../core/theme/rice_theme.dart';
 import '../../data/models/short_link.dart';
 import '../state/auth_controller.dart';
 import '../state/link_controller.dart';
@@ -102,12 +102,18 @@ class _DashboardViewState extends State<DashboardView> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Delete Short Link?"),
-        content: Text('Are you sure you want to permanently delete "${link.shortCode}"? This action cannot be undone.'),
+        title: Text(
+          "Delete Short Link?",
+          style: RiceTheme.heading(fontSize: 22, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
+        ),
+        content: Text(
+          'Are you sure you want to permanently delete "${link.shortCode}"? This action cannot be undone.',
+          style: RiceTheme.body(fontSize: 14, color: RiceColors.textPrimary, height: 1.4),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancel"),
+            child: Text("Cancel", style: RiceTheme.body(fontSize: 14, fontWeight: FontWeight.w600, color: RiceColors.riceBlue)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -118,7 +124,7 @@ class _DashboardViewState extends State<DashboardView> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: RiceColors.errorRed, foregroundColor: Colors.white),
-            child: const Text("Delete"),
+            child: Text("Delete", style: RiceTheme.body(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
           ),
         ],
       ),
@@ -159,7 +165,7 @@ class _DashboardViewState extends State<DashboardView> {
                             children: [
                               Text(
                                 "Rice Link & QR Studio",
-                                style: GoogleFonts.cormorantGaramond(
+                                style: RiceTheme.heading(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w700,
                                   color: RiceColors.riceBlue,
@@ -168,7 +174,7 @@ class _DashboardViewState extends State<DashboardView> {
                               const SizedBox(height: 4),
                               Text(
                                 "Manage all your university custom URLs and download Rice-branded QR codes.",
-                                style: GoogleFonts.lato(
+                                style: RiceTheme.body(
                                   fontSize: 14,
                                   color: RiceColors.textSecondary,
                                 ),
@@ -266,11 +272,11 @@ class _DashboardViewState extends State<DashboardView> {
               children: [
                 Text(
                   count,
-                  style: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w800, color: RiceColors.textPrimary),
+                  style: RiceTheme.body(fontSize: 22, fontWeight: FontWeight.w800, color: RiceColors.textPrimary),
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.lato(fontSize: 12, color: RiceColors.textSecondary),
+                  style: RiceTheme.body(fontSize: 12, color: RiceColors.textSecondary),
                 ),
               ],
             ),
@@ -298,7 +304,7 @@ class _DashboardViewState extends State<DashboardView> {
             const SizedBox(height: 16),
             Text(
               "No Matching Links",
-              style: GoogleFonts.cormorantGaramond(
+              style: RiceTheme.heading(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: RiceColors.riceBlue,
@@ -308,7 +314,7 @@ class _DashboardViewState extends State<DashboardView> {
             Text(
               "No links matched your search or status filter criteria.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textSecondary),
+              style: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary),
             ),
             const SizedBox(height: 20),
             RiceButton(
@@ -343,7 +349,7 @@ class _DashboardViewState extends State<DashboardView> {
             const SizedBox(height: 20),
             Text(
               "No Short Links Found",
-              style: GoogleFonts.cormorantGaramond(
+              style: RiceTheme.heading(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: RiceColors.riceBlue,
@@ -353,7 +359,7 @@ class _DashboardViewState extends State<DashboardView> {
             Text(
               "Create your first Rice University shortened link and styled QR code.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textSecondary),
+              style: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary),
             ),
             const SizedBox(height: 24),
             Wrap(
@@ -363,7 +369,7 @@ class _DashboardViewState extends State<DashboardView> {
               children: [
                 RiceButton(
                   label: "Create Short Link",
-                  icon: Icons.add_rounded,
+                  icon: Icons.link_rounded,
                   variant: RiceButtonVariant.primary,
                   onPressed: _openCreateModal,
                 ),

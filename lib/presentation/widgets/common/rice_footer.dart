@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 
 class RiceFooter extends StatelessWidget {
   const RiceFooter({super.key});
@@ -20,7 +20,7 @@ class RiceFooter extends StatelessWidget {
             children: [
               Text(
                 "© ${DateTime.now().year} Rice University • 6100 Main St., Houston, Texas 77005",
-                style: GoogleFonts.lato(
+                style: RiceTheme.body(
                   color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 13,
                 ),
@@ -29,7 +29,7 @@ class RiceFooter extends StatelessWidget {
                 children: [
                   Text(
                     "Rice Brand Guidelines Compliant",
-                    style: GoogleFonts.lato(
+                    style: RiceTheme.body(
                       color: RiceColors.laurelGold.withValues(alpha: 0.9),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,

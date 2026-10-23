@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../core/utils/url_validator.dart';
 import '../../../data/models/qr_config.dart';
 import '../../../data/services/qr_export_service.dart';
@@ -30,14 +31,22 @@ class StandaloneQrModal extends StatefulWidget {
 class _StandaloneQrModalState extends State<StandaloneQrModal> {
   final _formKey = GlobalKey<FormState>();
   final _urlController = TextEditingController();
+  late final ScrollController _scrollController;
 
   QrConfig _qrConfig = const QrConfig();
   int _selectedSize = 512;
   bool _isDownloading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
   void dispose() {
     _urlController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -102,9 +111,9 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "QR Code Destination",
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: RiceColors.textPrimary),
+          style: RiceTheme.heading(fontSize: 18, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
         ),
         const SizedBox(height: 14),
         RiceTextField(
@@ -116,9 +125,9 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
           validator: (val) => UrlValidator.validateUrl(val, isRequired: true),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           "PNG Resolution",
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+          style: RiceTheme.body(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
         ),
         const SizedBox(height: 6),
         Container(
@@ -142,7 +151,7 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
                   child: Text(
                     label,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13),
+                    style: RiceTheme.body(fontSize: 13, color: RiceColors.textPrimary),
                   ),
                 );
               }).toList(),
@@ -160,15 +169,15 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: RiceColors.riceBlue.withValues(alpha: 0.2)),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline_rounded, size: 18, color: RiceColors.riceBlue),
-              SizedBox(width: 10),
+              const Icon(Icons.info_outline_rounded, size: 18, color: RiceColors.riceBlue),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   "This QR code points directly to the web address above without creating a shortened link. It is not saved to your account—you will need to recreate it from scratch if you want to download it again later.",
-                  style: TextStyle(fontSize: 12.5, color: RiceColors.textPrimary, height: 1.4),
+                  style: RiceTheme.body(fontSize: 12.5, color: RiceColors.textPrimary, height: 1.4),
                 ),
               ),
             ],
@@ -194,9 +203,9 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Create Standalone QR Code",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RiceColors.riceBlue),
+                      style: RiceTheme.heading(fontSize: 24, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
@@ -206,35 +215,40 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
                 ),
                 const Divider(height: 24),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final details = _buildDetailsColumn();
-                        final qrStudio = LinkFormQrStudio(
-                          previewUrl: _previewUrl,
-                          qrConfig: _qrConfig,
-                          onQrConfigChanged: (cfg) => setState(() => _qrConfig = cfg),
-                        );
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.only(right: 16, bottom: 8),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final details = _buildDetailsColumn();
+                          final qrStudio = LinkFormQrStudio(
+                            previewUrl: _previewUrl,
+                            qrConfig: _qrConfig,
+                            onQrConfigChanged: (cfg) => setState(() => _qrConfig = cfg),
+                          );
 
-                        if (constraints.maxWidth > 650) {
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          if (constraints.maxWidth > 650) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(flex: 5, child: details),
+                                const SizedBox(width: 28),
+                                Expanded(flex: 5, child: qrStudio),
+                              ],
+                            );
+                          }
+
+                          return Column(
                             children: [
-                              Expanded(flex: 5, child: details),
-                              const SizedBox(width: 28),
-                              Expanded(flex: 5, child: qrStudio),
+                              details,
+                              const SizedBox(height: 24),
+                              qrStudio,
                             ],
                           );
-                        }
-
-                        return Column(
-                          children: [
-                            details,
-                            const SizedBox(height: 24),
-                            qrStudio,
-                          ],
-                        );
-                      },
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -244,7 +258,7 @@ class _StandaloneQrModalState extends State<StandaloneQrModal> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Close"),
+                      child: Text("Close", style: RiceTheme.body(fontSize: 14, fontWeight: FontWeight.w600, color: RiceColors.riceBlue)),
                     ),
                     const SizedBox(width: 12),
                     RiceButton(

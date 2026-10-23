@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../data/services/auth_service.dart';
 import '../../state/auth_controller.dart';
 import '../../widgets/common/rice_button.dart';
@@ -305,7 +305,7 @@ class _AuthViewState extends State<AuthView> {
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: GoogleFonts.lato(
+        style: RiceTheme.body(
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: RiceColors.textPrimary,
@@ -330,9 +330,10 @@ class _AuthViewState extends State<AuthView> {
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       onSubmitted: onSubmitted,
-      style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textPrimary),
+      style: RiceTheme.body(fontSize: 14, color: RiceColors.textPrimary),
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary.withValues(alpha: 0.7)),
         prefixIcon: Icon(prefixIcon, size: 20, color: RiceColors.textSecondary),
         suffixIcon: suffixIcon,
         filled: true,
@@ -376,7 +377,7 @@ class _AuthViewState extends State<AuthView> {
                     const SizedBox(width: 14),
                     Text(
                       "RICE UNIVERSITY",
-                      style: GoogleFonts.cormorantGaramond(
+                      style: RiceTheme.heading(
                         color: RiceColors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
@@ -418,7 +419,7 @@ class _AuthViewState extends State<AuthView> {
                         Text(
                           "URL Shortener & QR Studio",
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.cormorantGaramond(
+                          style: RiceTheme.heading(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
                             color: RiceColors.riceBlue,
@@ -429,7 +430,7 @@ class _AuthViewState extends State<AuthView> {
                         Text(
                           _getTitleDescription(),
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textSecondary, height: 1.4),
+                          style: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary, height: 1.4),
                         ),
 
                         const SizedBox(height: 24),
@@ -453,7 +454,7 @@ class _AuthViewState extends State<AuthView> {
                                 Expanded(
                                   child: Text(
                                     errorMessage,
-                                    style: const TextStyle(color: RiceColors.errorRed, fontSize: 13),
+                                    style: RiceTheme.body(color: RiceColors.errorRed, fontSize: 13),
                                   ),
                                 ),
                               ],
@@ -468,19 +469,19 @@ class _AuthViewState extends State<AuthView> {
                             padding: const EdgeInsets.all(12),
                             margin: const EdgeInsets.only(bottom: 20),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEBF7EE),
+                              color: RiceColors.grassGreen.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: const Color(0xFFB8E6C3)),
+                              border: Border.all(color: RiceColors.grassGreen.withValues(alpha: 0.3)),
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.check_circle_outline, color: Color(0xFF2E7D32), size: 18),
+                                const Icon(Icons.check_circle_outline, color: RiceColors.treeGreen, size: 18),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
                                     _infoMessage!,
-                                    style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 13),
+                                    style: RiceTheme.body(color: RiceColors.treeGreen, fontSize: 13),
                                   ),
                                 ),
                               ],
@@ -514,7 +515,7 @@ class _AuthViewState extends State<AuthView> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: RiceColors.lightGray,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
@@ -524,7 +525,7 @@ class _AuthViewState extends State<AuthView> {
                               Expanded(
                                 child: Text(
                                   "Restricted to verified @rice.edu email accounts.",
-                                  style: GoogleFonts.lato(
+                                  style: RiceTheme.body(
                                     fontSize: 12,
                                     color: RiceColors.textSecondary,
                                     fontWeight: FontWeight.w500,
@@ -620,7 +621,7 @@ class _AuthViewState extends State<AuthView> {
           onPressed: () => _switchMode(AuthViewMode.forgotPassword),
           child: Text(
             "Forgot password?",
-            style: GoogleFonts.lato(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
+            style: RiceTheme.body(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -638,12 +639,12 @@ class _AuthViewState extends State<AuthView> {
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text("Don't have an account? ", style: GoogleFonts.lato(fontSize: 13, color: RiceColors.textSecondary)),
+          Text("Don't have an account? ", style: RiceTheme.body(fontSize: 13, color: RiceColors.textSecondary)),
           TextButton(
             onPressed: () => _switchMode(AuthViewMode.signUp),
             child: Text(
               "Register with @rice.edu",
-              style: GoogleFonts.lato(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w700),
+              style: RiceTheme.body(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -722,12 +723,12 @@ class _AuthViewState extends State<AuthView> {
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text("Already have an account? ", style: GoogleFonts.lato(fontSize: 13, color: RiceColors.textSecondary)),
+          Text("Already have an account? ", style: RiceTheme.body(fontSize: 13, color: RiceColors.textSecondary)),
           TextButton(
             onPressed: () => _switchMode(AuthViewMode.signIn),
             child: Text(
               "Sign In",
-              style: GoogleFonts.lato(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w700),
+              style: RiceTheme.body(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -780,7 +781,7 @@ class _AuthViewState extends State<AuthView> {
         onPressed: () => _switchMode(AuthViewMode.signIn),
         child: Text(
           "Back to Sign In",
-          style: GoogleFonts.lato(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
+          style: RiceTheme.body(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
         ),
       ),
     ];
@@ -812,7 +813,7 @@ class _AuthViewState extends State<AuthView> {
         onPressed: () => _switchMode(AuthViewMode.signIn),
         child: Text(
           "Back to Sign In",
-          style: GoogleFonts.lato(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
+          style: RiceTheme.body(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
         ),
       ),
     ];
@@ -890,7 +891,7 @@ class _AuthViewState extends State<AuthView> {
         onPressed: () => _switchMode(AuthViewMode.signIn),
         child: Text(
           "Back to Sign In",
-          style: GoogleFonts.lato(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
+          style: RiceTheme.body(fontSize: 13, color: RiceColors.riceBlue, fontWeight: FontWeight.w600),
         ),
       ),
     ];

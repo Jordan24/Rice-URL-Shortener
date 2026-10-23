@@ -32,17 +32,27 @@
 
 ## 4. QR CODE ENGINE
 - **Module Shapes**: 3 styles (`square`, `rounded`, `dots`).
+- **Branding Packs**: Dropdown selector for University Branding and all 12 Residential Colleges:
+  1. `university` (Rice University - Default)
+  2. `baker` (Baker College)
+  3. `will_rice` (Will Rice College)
+  4. `hanszen` (Hanszen College)
+  5. `wiess` (Wiess College)
+  6. `jones` (Jones College)
+  7. `brown` (Brown College)
+  8. `lovett` (Lovett College)
+  9. `sid_richardson` (Sid Richardson College)
+  10. `martel` (Martel College)
+  11. `mcmurtry` (McMurtry College)
+  12. `duncan` (Duncan College)
+  13. `chao` (Chao College)
 - **Colors**:
-  - Presets:
-    - Foreground: Rice Blue (`#00205B`), Rice Gray (`#7C7E7F`), Dark Blue (`#00143D`), Light Blue (`#4B729F`), Laurel Gold (`#C19B4C`), Black (`#000000`).
-    - Background (Light Brand Tones): White (`#FFFFFF`), Off-White (`#F7F7F7`), Light Gray (`#E0E2E6`), Light Blue Gray (`#ADC7DC`), Accent Light Blue (`#CFEEFC`), Transparent (`#00000000`).
-  - Custom Color Picker (Hex/RGB). Default: Rice Blue foreground, White background.
-- **Center Logos**: Official Rice marks with quiet zone cutout:
-  1. `shield` (Rice University Crest / Shield - Academic)
-  2. `owl` (Rice Owl - Spirit/Athletics)
-  3. `old_english_r` (Old English R)
-  4. `none`
-  - Default: First option (`shield`).
+  - University Presets: Rice Blue (`#00205B`), Rice Gray (`#7C7E7F`), Rich Blue (`#0A509E`), Medium Blue (`#4D9AD4`), Dark Gray (`#44474F`), Black (`#000000`).
+  - College Presets: Tailored to each college's crest & brand identity with generic neutral options (White, Black, Light Gray, Transparent).
+  - Custom Color Picker (Hex/RGB).
+- **Center Logos**: Official marks with transparent background cutout (dynamically colored to match the selected foreground color):
+  - University: `owl` (Rice Owl - Academic & Spirit Mark), `old_english_r` (Old English R - Heritage Mark), `none`.
+  - Residential Colleges: Respective crest/shield/symbol replacing university marks, plus `none`.
 - **Exports**: Web client-side Canvas/SVG rasterizer for PNG (512px, 1024px, 2048px) and scalable SVG.
 
 ## 5. UI/UX & DESIGN SYSTEM (RICE.EDU INSPIRED)

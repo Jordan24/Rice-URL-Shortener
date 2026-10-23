@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import '../../../core/constants/branding_colors.dart';
+import '../../../core/constants/branding_pack.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
+import 'qr_color_picker_dialog.dart';
+import 'qr_contrast_warning.dart';
 
 class QrColorSelector extends StatelessWidget {
   final String fgColorHex;
   final String bgColorHex;
+  final BrandingPackType brandingPack;
   final ValueChanged<String> onFgColorChanged;
   final ValueChanged<String> onBgColorChanged;
 
@@ -12,69 +17,35 @@ class QrColorSelector extends StatelessWidget {
     super.key,
     required this.fgColorHex,
     required this.bgColorHex,
+    this.brandingPack = BrandingPackType.university,
     required this.onFgColorChanged,
     required this.onBgColorChanged,
   });
 
-  void _showColorPickerDialog(BuildContext context, String currentHex, ValueChanged<String> onSelected, String title) {
-    Color pickerColor = _parseColor(currentHex);
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: pickerColor,
-            onColorChanged: (c) => pickerColor = c,
-            pickerAreaHeightPercent: 0.7,
-            enableAlpha: true,
-            displayThumbColor: true,
-            paletteType: PaletteType.hsvWithHue,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final hex = "#${pickerColor.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}";
-              onSelected(hex);
-              Navigator.pop(ctx);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: RiceColors.riceBlue, foregroundColor: Colors.white),
-            child: const Text("Select"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _parseColor(String hex) {
-    var cleaned = hex.replaceAll("#", "").trim();
-    if (cleaned.length == 6) cleaned = "FF$cleaned";
-    if (cleaned.length == 8) {
-      final val = int.tryParse(cleaned, radix: 16);
-      if (val != null) return Color(val);
-    }
-    return RiceColors.riceBlue;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final fgPresets = BrandingColors.getFgPresets(brandingPack);
+    final bgPresets = BrandingColors.getBgPresets(brandingPack);
+    final fgTitle = brandingPack == BrandingPackType.university
+        ? "Foreground Color (Rice Brand)"
+        : "Foreground Color (${brandingPack.shortName})";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Foreground Section
         _buildColorSection(
           context: context,
-          title: "Foreground Color (Rice Brand)",
+          title: fgTitle,
           currentHex: fgColorHex,
-          presets: RiceColors.fgPresets,
+          presets: fgPresets,
           onPresetSelected: onFgColorChanged,
-          onCustomTap: () => _showColorPickerDialog(context, fgColorHex, onFgColorChanged, "Custom Foreground Color"),
+          onCustomTap: () => showQrColorPickerDialog(
+            context: context,
+            currentHex: fgColorHex,
+            onSelected: onFgColorChanged,
+            title: "Custom Foreground Color",
+          ),
         ),
 
         const SizedBox(height: 16),
@@ -84,9 +55,20 @@ class QrColorSelector extends StatelessWidget {
           context: context,
           title: "Background Color",
           currentHex: bgColorHex,
-          presets: RiceColors.bgPresets,
+          presets: bgPresets,
           onPresetSelected: onBgColorChanged,
-          onCustomTap: () => _showColorPickerDialog(context, bgColorHex, onBgColorChanged, "Custom Background Color"),
+          onCustomTap: () => showQrColorPickerDialog(
+            context: context,
+            currentHex: bgColorHex,
+            onSelected: onBgColorChanged,
+            title: "Custom Background Color",
+          ),
+        ),
+
+        // Real-time contrast validation warning
+        QrContrastWarning(
+          fgColorHex: fgColorHex,
+          bgColorHex: bgColorHex,
         ),
       ],
     );
@@ -111,13 +93,13 @@ class QrColorSelector extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+                style: RiceTheme.body(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
               ),
             ),
             const SizedBox(width: 8),
             Text(
               normCurrent,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: RiceColors.textSecondary),
+              style: RiceTheme.body(fontSize: 12, fontWeight: FontWeight.w500, color: RiceColors.textSecondary),
             ),
           ],
         ),
@@ -128,57 +110,70 @@ class QrColorSelector extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             ...presets.map((preset) {
-              final isSelected = preset.hex.toUpperCase() == normCurrent;
-              final isTransparent = preset.hex == "#00000000";
+              final isSelected = normCurrent == preset.hex.toUpperCase() ||
+                  (preset.hex.length == 7 && normCurrent == '#FF${preset.hex.substring(1)}'.toUpperCase());
+
+              final isTrans = preset.color.a == 0;
 
               return Tooltip(
                 message: preset.name,
                 child: InkWell(
                   onTap: () => onPresetSelected(preset.hex),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(18),
                   child: Container(
-                    width: 32,
-                    height: 32,
+                    width: 34,
+                    height: 34,
                     decoration: BoxDecoration(
-                      color: isTransparent ? Colors.transparent : preset.color,
+                      color: preset.color,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? RiceColors.laurelGold : RiceColors.borderLight,
-                        width: isSelected ? 2.5 : 1.2,
+                        color: isSelected ? RiceColors.riceBlue : RiceColors.borderLight,
+                        width: isSelected ? 2.5 : 1,
                       ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: RiceColors.riceBlue.withValues(alpha: 0.3),
+                                blurRadius: 4,
+                                spreadRadius: 1,
+                              ),
+                            ]
+                          : null,
                     ),
-                    child: isTransparent
-                        ? const Center(child: Icon(Icons.block, size: 16, color: RiceColors.textSecondary))
-                        : (isSelected
+                    child: isTrans
+                        ? const Center(
+                            child: Icon(Icons.close, size: 16, color: RiceColors.textSecondary),
+                          )
+                        : isSelected
                             ? Center(
                                 child: Icon(
                                   Icons.check,
                                   size: 16,
-                                  color: preset.color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+                                  color: preset.color.computeLuminance() > 0.5 ? RiceColors.darkGray : Colors.white,
                                 ),
                               )
-                            : null),
+                            : null,
                   ),
                 ),
               );
             }),
 
-            // Custom Picker Button
+            // Custom Color Picker Button
             Tooltip(
-              message: "Custom Color Picker",
+              message: "Custom Color",
               child: InkWell(
                 onTap: onCustomTap,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(18),
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: RiceColors.white,
                     shape: BoxShape.circle,
-                    border: Border.all(color: RiceColors.borderLight, width: 1.2),
+                    border: Border.all(color: RiceColors.borderLight, width: 1),
                   ),
                   child: const Center(
-                    child: Icon(Icons.colorize_rounded, size: 16, color: RiceColors.riceBlue),
+                    child: Icon(Icons.colorize_rounded, size: 16, color: RiceColors.textPrimary),
                   ),
                 ),
               ),

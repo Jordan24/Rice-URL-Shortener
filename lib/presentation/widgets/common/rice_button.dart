@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 
 enum RiceButtonVariant { primary, secondary, outline, danger }
 
@@ -64,11 +65,11 @@ class RiceButton extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: fg),
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.w600, fontSize: 14)),
+          Text(label, style: RiceTheme.body(color: fg, fontWeight: FontWeight.w600, fontSize: 14)),
         ],
       );
     } else {
-      child = Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.w600, fontSize: 14));
+      child = Text(label, style: RiceTheme.body(color: fg, fontWeight: FontWeight.w600, fontSize: 14));
     }
 
     final buttonStyle = ElevatedButton.styleFrom(

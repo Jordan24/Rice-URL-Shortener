@@ -27,11 +27,9 @@ class QrPreviewCard extends StatelessWidget {
     final qrImage = QrImage(qrCode);
     final moduleCount = qrImage.moduleCount;
 
-    final centerStart = (moduleCount * 0.38).floor();
-    final centerEnd = (moduleCount * 0.62).ceil();
     final hasLogo = qrConfig.logoType != RiceLogoType.none;
-
-    final logoModules = (centerEnd - centerStart + 1).toDouble();
+    final cutout = QrDrawingHelper.getLogoCutoutRange(moduleCount);
+    final logoModules = (cutout.end - cutout.start + 1).toDouble();
     final logoSize = (logoModules / moduleCount) * size;
     final assetPath = RiceLogos.getAssetPath(qrConfig.logoType);
 
@@ -65,21 +63,14 @@ class QrPreviewCard extends StatelessWidget {
               ),
             ),
             if (hasLogo && assetPath != null)
-              Container(
+              SizedBox(
                 width: logoSize,
                 height: logoSize,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(logoSize * 0.16),
-                  border: Border.all(
-                    color: qrConfig.fgColor.withValues(alpha: 0.15),
-                    width: 1.5,
-                  ),
-                ),
-                padding: EdgeInsets.all(logoSize * 0.1),
                 child: Image.asset(
                   assetPath,
                   fit: BoxFit.contain,
+                  color: qrConfig.logoType.isUniversityMark ? qrConfig.fgColor : null,
+                  colorBlendMode: qrConfig.logoType.isUniversityMark ? BlendMode.srcIn : null,
                   filterQuality: FilterQuality.high,
                 ),
               ),
@@ -110,10 +101,8 @@ class _QrCustomPainter extends CustomPainter {
       ..color = config.fgColor
       ..style = PaintingStyle.fill;
 
-    final centerStart = (moduleCount * 0.38).floor();
-    final centerEnd = (moduleCount * 0.62).ceil();
     final hasLogo = config.logoType != RiceLogoType.none;
-    bool isLogoArea(int x, int y) => hasLogo && x >= centerStart && x <= centerEnd && y >= centerStart && y <= centerEnd;
+    bool isLogoArea(int x, int y) => QrDrawingHelper.isLogoArea(x, y, moduleCount, hasLogo);
 
     // 1. Draw Position Detection Eyes
     QrDrawingHelper.drawFinderEyes(canvas, moduleCount, scale, config.style, fgPaint);

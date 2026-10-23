@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../core/utils/url_validator.dart';
 import '../../../data/models/qr_config.dart';
 import '../../../data/models/short_link.dart';
@@ -27,6 +28,7 @@ class _EditLinkModalState extends State<EditLinkModal> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _destController;
   late final TextEditingController _fallbackController;
+  late final ScrollController _scrollController;
 
   DateTime? _expiresAt;
   bool _hasExpiration = false;
@@ -39,9 +41,18 @@ class _EditLinkModalState extends State<EditLinkModal> {
     super.initState();
     _destController = TextEditingController(text: widget.link.destinationUrl);
     _fallbackController = TextEditingController(text: widget.link.fallbackUrl);
+    _scrollController = ScrollController();
     _expiresAt = widget.link.expiresAt;
     _hasExpiration = widget.link.expiresAt != null;
     _qrConfig = widget.link.qrConfig;
+  }
+
+  @override
+  void dispose() {
+    _destController.dispose();
+    _fallbackController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickExpirationDate() async {
@@ -143,19 +154,24 @@ class _EditLinkModalState extends State<EditLinkModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Edit Short Link & QR Code",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RiceColors.riceBlue),
-                        ),
-                        Text(
-                          fullUrl,
-                          style: const TextStyle(fontSize: 12, color: RiceColors.textSecondary),
-                        ),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Edit Short Link & QR Code",
+                            style: RiceTheme.heading(fontSize: 24, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            fullUrl,
+                            style: RiceTheme.body(fontSize: 12, color: RiceColors.textSecondary),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close, size: 20),
@@ -175,13 +191,17 @@ class _EditLinkModalState extends State<EditLinkModal> {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: RiceColors.errorRed.withValues(alpha: 0.3)),
                     ),
-                    child: Text(_error!, style: const TextStyle(color: RiceColors.errorRed, fontSize: 13)),
+                    child: Text(_error!, style: RiceTheme.body(color: RiceColors.errorRed, fontSize: 13)),
                   ),
                 ],
 
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: LayoutBuilder(
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.only(right: 16, bottom: 8),
+                      child: LayoutBuilder(
                       builder: (context, constraints) {
                         final isTwoColumn = constraints.maxWidth > 650;
                         final details = LinkFormDetails(
@@ -229,8 +249,9 @@ class _EditLinkModalState extends State<EditLinkModal> {
                     ),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
                 // Bottom Buttons
                 Row(
@@ -238,7 +259,7 @@ class _EditLinkModalState extends State<EditLinkModal> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Cancel"),
+                      child: Text("Cancel", style: RiceTheme.body(fontSize: 14, fontWeight: FontWeight.w600, color: RiceColors.riceBlue)),
                     ),
                     const SizedBox(width: 12),
                     RiceButton(

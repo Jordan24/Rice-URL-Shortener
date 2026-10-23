@@ -30,22 +30,21 @@ class QrExportService {
     final totalModules = moduleCount + (quietZone * 2);
 
     final fgColorHex = config.fgColorHex.startsWith("#") ? config.fgColorHex : "#${config.fgColorHex}";
-    final isTransparent = config.isBgTransparent;
-    final bgColorHex = isTransparent ? "none" : (config.bgColorHex.startsWith("#") ? config.bgColorHex : "#${config.bgColorHex}");
+    final bgColorHex = config.isBgTransparent
+        ? "none"
+        : (config.bgColorHex.startsWith("#") ? config.bgColorHex : "#${config.bgColorHex}");
 
-    final buffer = StringBuffer();
-    buffer.writeln('<?xml version="1.0" encoding="UTF-8"?>');
-    buffer.writeln('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 $totalModules $totalModules" width="$size" height="$size">');
+    final buffer = StringBuffer()
+      ..writeln('<?xml version="1.0" encoding="UTF-8"?>')
+      ..writeln('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 $totalModules $totalModules" width="$size" height="$size">');
 
-    // Background covering full image including quiet zone
-    if (!isTransparent) {
+    if (!config.isBgTransparent) {
       buffer.writeln('  <rect width="$totalModules" height="$totalModules" fill="$bgColorHex"/>');
     }
 
-    final centerStart = (moduleCount * 0.38).floor();
-    final centerEnd = (moduleCount * 0.62).ceil();
+    final cutout = QrDrawingHelper.getLogoCutoutRange(moduleCount);
     final hasLogo = config.logoType != RiceLogoType.none;
-    bool isLogoArea(int x, int y) => hasLogo && x >= centerStart && x <= centerEnd && y >= centerStart && y <= centerEnd;
+    bool isLogoArea(int x, int y) => QrDrawingHelper.isLogoArea(x, y, moduleCount, hasLogo);
 
     final alignmentCenters = QrDrawingHelper.getAlignmentCenters(moduleCount);
 
@@ -64,18 +63,21 @@ class QrExportService {
       alignmentCenters: alignmentCenters,
     );
 
-    // Quiet zone cutout and Center Logo (embedded PNG)
+    // Center Logo (transparent background so QR background shows through, foreground-colored SVG path)
     if (hasLogo) {
-      final logoWidth = centerEnd - centerStart + 1;
-      final logoOffset = centerStart.toDouble();
-
-      // Quiet zone background
-      buffer.writeln('  <rect x="$logoOffset" y="$logoOffset" width="$logoWidth" height="$logoWidth" rx="1.5" fill="white"/>');
+      final logoWidth = (cutout.end - cutout.start + 1).toDouble();
+      final logoOffset = cutout.start.toDouble();
 
       final base64Png = logoBase64;
       if (base64Png != null && base64Png.isNotEmpty) {
-        const pad = 0.5;
-        buffer.writeln('  <image href="data:image/png;base64,$base64Png" x="${logoOffset + pad}" y="${logoOffset + pad}" width="${logoWidth - 2 * pad}" height="${logoWidth - 2 * pad}" preserveAspectRatio="xMidYMid meet"/>');
+        buffer.writeln('  <image href="data:image/png;base64,$base64Png" x="$logoOffset" y="$logoOffset" width="$logoWidth" height="$logoWidth" preserveAspectRatio="xMidYMid meet"/>');
+      } else {
+        final svgPath = RiceLogos.getSvgPathData(config.logoType);
+        if (svgPath != null && svgPath.isNotEmpty) {
+          buffer.writeln('  <svg x="$logoOffset" y="$logoOffset" width="$logoWidth" height="$logoWidth" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">');
+          buffer.writeln('    <path fill="$fgColorHex" fill-rule="evenodd" d="$svgPath"/>');
+          buffer.writeln('  </svg>');
+        }
       }
     }
 
@@ -116,10 +118,9 @@ class QrExportService {
       ..color = config.fgColor
       ..style = PaintingStyle.fill;
 
-    final centerStart = (moduleCount * 0.38).floor();
-    final centerEnd = (moduleCount * 0.62).ceil();
+    final cutout = QrDrawingHelper.getLogoCutoutRange(moduleCount);
     final hasLogo = config.logoType != RiceLogoType.none;
-    bool isLogoArea(int x, int y) => hasLogo && x >= centerStart && x <= centerEnd && y >= centerStart && y <= centerEnd;
+    bool isLogoArea(int x, int y) => QrDrawingHelper.isLogoArea(x, y, moduleCount, hasLogo);
 
     // 1. Draw Position Detection Eyes
     QrDrawingHelper.drawFinderEyes(canvas, moduleCount, scale, config.style, fgPaint);
@@ -154,31 +155,23 @@ class QrExportService {
       }
     }
 
-    // Logo Quiet Zone & PNG image drawing
+    // Center Logo drawing (transparent background, tinted to foreground color)
     if (hasLogo) {
       final logoRect = Rect.fromLTRB(
-        centerStart * scale,
-        centerStart * scale,
-        (centerEnd + 1) * scale,
-        (centerEnd + 1) * scale,
+        cutout.start * scale,
+        cutout.start * scale,
+        (cutout.end + 1) * scale,
+        (cutout.end + 1) * scale,
       );
 
-      final quietPaint = Paint()..color = Colors.white;
-      canvas.drawRRect(RRect.fromRectAndRadius(logoRect, Radius.circular(scale * 1.5)), quietPaint);
-
-      final quietBorder = Paint()
-        ..color = config.fgColor.withValues(alpha: 0.15)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
-      canvas.drawRRect(RRect.fromRectAndRadius(logoRect, Radius.circular(scale * 1.5)), quietBorder);
-
-      // Draw official Rice logo PNG asset
       final uiImage = await RiceLogos.getUiImage(config.logoType);
       if (uiImage != null) {
-        final destRect = logoRect.deflate(scale * 0.7);
         final srcRect = Rect.fromLTWH(0, 0, uiImage.width.toDouble(), uiImage.height.toDouble());
         final imagePaint = Paint()..filterQuality = FilterQuality.high;
-        canvas.drawImageRect(uiImage, srcRect, destRect, imagePaint);
+        if (config.logoType.isUniversityMark) {
+          imagePaint.colorFilter = ColorFilter.mode(config.fgColor, BlendMode.srcIn);
+        }
+        canvas.drawImageRect(uiImage, srcRect, logoRect, imagePaint);
       }
     }
 
@@ -193,10 +186,7 @@ class QrExportService {
 
   /// Triggers browser download for SVG
   static Future<void> exportSvg(String data, QrConfig config, String shortCode) async {
-    String? base64Png;
-    if (config.logoType != RiceLogoType.none) {
-      base64Png = await RiceLogos.getBase64Png(config.logoType);
-    }
+    final base64Png = config.logoType.isUniversityMark ? null : await RiceLogos.getBase64Png(config.logoType);
     final svgString = generateSvg(data, config, logoBase64: base64Png);
     WebDownloadHelper.downloadString(svgString, "rice_qr_$shortCode.svg", "image/svg+xml");
   }

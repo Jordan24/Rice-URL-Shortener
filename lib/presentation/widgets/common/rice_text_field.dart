@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 
 class RiceTextField extends StatelessWidget {
   final String label;
@@ -35,7 +35,7 @@ class RiceTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.lato(
+          style: RiceTheme.body(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: RiceColors.textPrimary,
@@ -48,15 +48,17 @@ class RiceTextField extends StatelessWidget {
           readOnly: readOnly,
           onChanged: onChanged,
           maxLines: maxLines,
-          style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textPrimary),
+          style: RiceTheme.body(fontSize: 14, color: RiceColors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary.withValues(alpha: 0.7)),
             prefixIcon: prefix,
             suffixIcon: suffix,
             helperText: helperText,
-            helperStyle: GoogleFonts.lato(fontSize: 12, color: RiceColors.textSecondary),
+            helperStyle: RiceTheme.body(fontSize: 12, color: RiceColors.textSecondary),
+            errorStyle: RiceTheme.body(fontSize: 12, color: RiceColors.errorRed),
             filled: true,
-            fillColor: readOnly ? const Color(0xFFF1F5F9) : RiceColors.white,
+            fillColor: readOnly ? RiceColors.lightGray : RiceColors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),

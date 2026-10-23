@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/rice_colors.dart';
+import '../../core/theme/rice_theme.dart';
 import '../widgets/common/rice_button.dart';
 import '../widgets/common/rice_card.dart';
 import '../widgets/common/rice_footer.dart';
@@ -27,7 +27,7 @@ class NotFoundView extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   "RICE UNIVERSITY",
-                  style: GoogleFonts.cormorantGaramond(
+                  style: RiceTheme.heading(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -52,7 +52,7 @@ class NotFoundView extends StatelessWidget {
                       children: [
                         Text(
                           "404",
-                          style: GoogleFonts.cormorantGaramond(
+                          style: RiceTheme.heading(
                             fontSize: 72,
                             fontWeight: FontWeight.w700,
                             color: RiceColors.riceBlue,
@@ -62,7 +62,7 @@ class NotFoundView extends StatelessWidget {
                         Text(
                           "Link Not Found or Expired",
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.cormorantGaramond(
+                          style: RiceTheme.heading(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
                             color: RiceColors.textPrimary,
@@ -74,7 +74,7 @@ class NotFoundView extends StatelessWidget {
                               ? 'The short link "$code" does not exist or has been disabled.'
                               : "The requested short link could not be found.",
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.lato(fontSize: 14, color: RiceColors.textSecondary),
+                          style: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary),
                         ),
                         const SizedBox(height: 28),
                         RiceButton(

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../data/models/short_link.dart';
 import '../../../data/services/qr_export_service.dart';
 import '../common/rice_button.dart';
+import '../qr/qr_contrast_warning.dart';
 import '../qr/qr_preview_card.dart';
 
 class QrDownloadModal extends StatefulWidget {
@@ -84,14 +86,14 @@ class _QrDownloadModalState extends State<QrDownloadModal> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         "Download QR Code",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RiceColors.riceBlue),
+                        style: RiceTheme.heading(fontSize: 22, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         fullUrl,
-                        style: const TextStyle(fontSize: 12, color: RiceColors.textSecondary),
+                        style: RiceTheme.body(fontSize: 12, color: RiceColors.textSecondary),
                       ),
                     ],
                   ),
@@ -111,15 +113,22 @@ class _QrDownloadModalState extends State<QrDownloadModal> {
                 size: 200,
               ),
 
-              const SizedBox(height: 24),
+              // QR contrast warning
+              QrContrastWarning(
+                fgColorHex: widget.link.qrConfig.fgColorHex,
+                bgColorHex: widget.link.qrConfig.bgColorHex,
+                margin: const EdgeInsets.only(top: 14),
+              ),
+
+              const SizedBox(height: 20),
 
               // Size selector for PNG (128, 256, 512, 1024, 2048)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "PNG Resolution:",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+                    style: RiceTheme.body(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
                   ),
                   DropdownButton<int>(
                     value: _selectedSize,
@@ -131,7 +140,7 @@ class _QrDownloadModalState extends State<QrDownloadModal> {
                       if (size >= 1024) label += " (High Res / Print)";
                       return DropdownMenuItem<int>(
                         value: size,
-                        child: Text(label, style: const TextStyle(fontSize: 13)),
+                        child: Text(label, style: RiceTheme.body(fontSize: 13, color: RiceColors.textPrimary)),
                       );
                     }).toList(),
                     onChanged: (val) {

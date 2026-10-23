@@ -34,6 +34,24 @@ void main() {
       expect(centers.isNotEmpty, isTrue);
       expect(centers.any((c) => c.x == 22 && c.y == 22), isTrue);
     });
+
+    test('getLogoCutoutRange produces perfectly symmetric cutout across all QR versions', () {
+      // Test QR versions 1 to 10 (21 to 57 modules, step 4)
+      for (int v = 1; v <= 10; v++) {
+        final moduleCount = v * 4 + 17;
+        final cutout = QrDrawingHelper.getLogoCutoutRange(moduleCount);
+        final leftModules = cutout.start;
+        final rightModules = moduleCount - 1 - cutout.end;
+        // Verify left and right margins are exactly equal
+        expect(leftModules, equals(rightModules),
+            reason: 'Asymmetric cutout on version $v ($moduleCount modules): left=$leftModules, right=$rightModules');
+
+        // Verify cutout center matches exact QR center
+        final cutoutCenter = (cutout.start + cutout.end) / 2.0;
+        final qrCenter = (moduleCount - 1) / 2.0;
+        expect(cutoutCenter, equals(qrCenter));
+      }
+    });
   });
 
   group('QrExportService Generation Tests', () {

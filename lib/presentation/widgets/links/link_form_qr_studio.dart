@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/branding_colors.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/constants/rice_logos.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../data/models/qr_config.dart';
+import '../qr/qr_branding_selector.dart';
 import '../qr/qr_color_selector.dart';
 import '../qr/qr_logo_selector.dart';
 import '../qr/qr_preview_card.dart';
@@ -23,9 +27,9 @@ class LinkFormQrStudio extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "QR Code Studio",
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: RiceColors.textPrimary),
+          style: RiceTheme.heading(fontSize: 18, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
         ),
         const SizedBox(height: 14),
 
@@ -38,6 +42,27 @@ class LinkFormQrStudio extends StatelessWidget {
 
         const SizedBox(height: 16),
 
+        // Branding Pack Selector (Rice University & 12 Residential Colleges)
+        QrBrandingSelector(
+          selectedPack: qrConfig.brandingPack,
+          onBrandingPackChanged: (newPack) {
+            final defaultFg = BrandingColors.getDefaultFgColorHex(newPack);
+            final defaultBg = BrandingColors.getDefaultBgColorHex(newPack);
+            final defaultLogo = RiceLogos.getDefaultLogoForPack(newPack);
+
+            onQrConfigChanged(
+              qrConfig.copyWith(
+                brandingPack: newPack,
+                fgColorHex: defaultFg,
+                bgColorHex: defaultBg,
+                logoType: qrConfig.logoType == RiceLogoType.none ? RiceLogoType.none : defaultLogo,
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 16),
+
         // QR Module Style
         QrStyleSelector(
           selectedStyle: qrConfig.style,
@@ -46,19 +71,21 @@ class LinkFormQrStudio extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // QR Colors
+        // QR Colors (Tailored to selected branding pack)
         QrColorSelector(
           fgColorHex: qrConfig.fgColorHex,
           bgColorHex: qrConfig.bgColorHex,
+          brandingPack: qrConfig.brandingPack,
           onFgColorChanged: (c) => onQrConfigChanged(qrConfig.copyWith(fgColorHex: c)),
           onBgColorChanged: (c) => onQrConfigChanged(qrConfig.copyWith(bgColorHex: c)),
         ),
 
         const SizedBox(height: 16),
 
-        // QR Logo
+        // QR Logo (Tailored to selected branding pack)
         QrLogoSelector(
           selectedLogo: qrConfig.logoType,
+          brandingPack: qrConfig.brandingPack,
           onLogoChanged: (l) => onQrConfigChanged(qrConfig.copyWith(logoType: l)),
         ),
       ],

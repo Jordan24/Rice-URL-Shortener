@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../data/models/qr_config.dart';
 
 class QrStyleSelector extends StatelessWidget {
@@ -17,9 +18,9 @@ class QrStyleSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Module Shape & Style",
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+          style: RiceTheme.body(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
         ),
         const SizedBox(height: 8),
         Row(
@@ -62,7 +63,7 @@ class QrStyleSelector extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           style.label,
-                          style: TextStyle(
+                          style: RiceTheme.body(
                             fontSize: 12,
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected ? RiceColors.riceBlue : RiceColors.textPrimary,

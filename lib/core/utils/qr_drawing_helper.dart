@@ -54,6 +54,22 @@ class QrPoint {
 class QrDrawingHelper {
   QrDrawingHelper._();
 
+  /// Computes the exact, symmetric module range [start..end] for the center logo cutout.
+  /// Since all standard QR codes have an odd number of modules, this guarantees that
+  /// left, right, top, and bottom margins are identical to the exact module.
+  static ({int start, int end}) getLogoCutoutRange(int moduleCount) {
+    final center = (moduleCount - 1) ~/ 2;
+    final radius = ((moduleCount * 0.25 - 1) / 2).round();
+    return (start: center - radius, end: center + radius);
+  }
+
+  /// Determines if module (x, y) falls inside the center logo cutout
+  static bool isLogoArea(int x, int y, int moduleCount, bool hasLogo) {
+    if (!hasLogo) return false;
+    final cutout = getLogoCutoutRange(moduleCount);
+    return x >= cutout.start && x <= cutout.end && y >= cutout.start && y <= cutout.end;
+  }
+
   static bool isFinderPattern(int x, int y, int moduleCount) {
     if (x < 7 && y < 7) return true;
     if (x >= moduleCount - 7 && y < 7) return true;

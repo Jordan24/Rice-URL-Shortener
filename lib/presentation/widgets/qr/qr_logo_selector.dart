@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/branding_pack.dart';
 import '../../../core/constants/rice_colors.dart';
 import '../../../core/constants/rice_logos.dart';
+import '../../../core/theme/rice_theme.dart';
 
 class QrLogoSelector extends StatelessWidget {
   final RiceLogoType selectedLogo;
+  final BrandingPackType brandingPack;
   final ValueChanged<RiceLogoType> onLogoChanged;
 
   const QrLogoSelector({
     super.key,
     required this.selectedLogo,
+    this.brandingPack = BrandingPackType.university,
     required this.onLogoChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final logos = RiceLogos.getLogosForPack(brandingPack);
+    final sectionTitle = brandingPack == BrandingPackType.university
+        ? "Center Rice University Logo"
+        : "Center ${brandingPack.shortName} Crest / Logo";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Center Rice University Logo",
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+        Text(
+          sectionTitle,
+          style: RiceTheme.body(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
         ),
         const SizedBox(height: 8),
         Column(
-          children: RiceLogoType.values.map((logo) {
+          children: logos.map((logo) {
             final isSelected = logo == selectedLogo;
 
             return Padding(
@@ -48,7 +57,7 @@ class QrLogoSelector extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: RiceColors.lightGray,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: RiceColors.borderLight),
                           ),
@@ -90,7 +99,7 @@ class QrLogoSelector extends StatelessWidget {
                           children: [
                             Text(
                               logo.label,
-                              style: TextStyle(
+                              style: RiceTheme.body(
                                 fontSize: 13,
                                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                                 color: isSelected ? RiceColors.riceBlue : RiceColors.textPrimary,
@@ -98,7 +107,7 @@ class QrLogoSelector extends StatelessWidget {
                             ),
                             Text(
                               logo.description,
-                              style: const TextStyle(fontSize: 11, color: RiceColors.textSecondary),
+                              style: RiceTheme.body(fontSize: 11, color: RiceColors.textSecondary),
                             ),
                           ],
                         ),

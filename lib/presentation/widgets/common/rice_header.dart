@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../state/auth_controller.dart';
 
 class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
@@ -50,7 +50,7 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Text(
                     "RICE UNIVERSITY",
-                    style: GoogleFonts.cormorantGaramond(
+                    style: RiceTheme.heading(
                       color: RiceColors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -59,7 +59,7 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   Text(
                     "URL Shortener & QR Studio",
-                    style: GoogleFonts.lato(
+                    style: RiceTheme.body(
                       color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
@@ -85,9 +85,9 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
                 icon: const Icon(Icons.qr_code_2_rounded, size: 19, color: RiceColors.laurelGold),
-                label: const Text(
+                label: Text(
                   "Create QR Code",
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: RiceTheme.body(fontWeight: FontWeight.w600, color: RiceColors.white),
                 ),
               ),
               const SizedBox(width: 12),
@@ -101,10 +101,10 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
-                icon: const Icon(Icons.add_rounded, size: 20),
-                label: const Text(
+                icon: const Icon(Icons.link_rounded, size: 20),
+                label: Text(
                   "Create Short Link",
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  style: RiceTheme.body(fontWeight: FontWeight.w700, color: RiceColors.darkBlue),
                 ),
               ),
             const SizedBox(width: 16),
@@ -125,23 +125,23 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                     children: [
                       Text(
                         user?.displayName ?? "Rice User",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: RiceColors.textPrimary),
+                        style: RiceTheme.body(fontWeight: FontWeight.w700, color: RiceColors.textPrimary),
                       ),
                       Text(
                         user?.email ?? "",
-                        style: const TextStyle(fontSize: 12, color: RiceColors.textSecondary),
+                        style: RiceTheme.body(fontSize: 12, color: RiceColors.textSecondary),
                       ),
                       const Divider(height: 16),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: "signout",
                   child: Row(
                     children: [
-                      Icon(Icons.logout_rounded, size: 18, color: RiceColors.errorRed),
-                      SizedBox(width: 8),
-                      Text("Sign Out", style: TextStyle(color: RiceColors.errorRed)),
+                      const Icon(Icons.logout_rounded, size: 18, color: RiceColors.errorRed),
+                      const SizedBox(width: 8),
+                      Text("Sign Out", style: RiceTheme.body(color: RiceColors.errorRed, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -160,7 +160,7 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                       backgroundColor: RiceColors.laurelGold,
                       child: Text(
                         (user?.displayName ?? "U").substring(0, 1).toUpperCase(),
-                        style: const TextStyle(color: RiceColors.riceBlue, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: RiceTheme.body(color: RiceColors.riceBlue, fontWeight: FontWeight.w700, fontSize: 13),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -169,7 +169,7 @@ class RiceHeader extends StatelessWidget implements PreferredSizeWidget {
                       child: Text(
                         user?.displayName ?? "Rice User",
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                        style: RiceTheme.body(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(width: 4),

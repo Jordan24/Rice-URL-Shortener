@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../core/utils/code_generator.dart';
 import '../../../core/utils/url_validator.dart';
 import '../../../data/models/qr_config.dart';
@@ -30,6 +31,7 @@ class _CreateLinkModalState extends State<CreateLinkModal> {
   final _destController = TextEditingController();
   final _slugController = TextEditingController();
   final _fallbackController = TextEditingController(text: AppConstants.defaultFallbackUrl);
+  late final ScrollController _scrollController;
 
   DateTime? _expiresAt;
   bool _hasExpiration = false;
@@ -41,6 +43,16 @@ class _CreateLinkModalState extends State<CreateLinkModal> {
   void initState() {
     super.initState();
     _slugController.text = CodeGenerator.generateShortCode();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _destController.dispose();
+    _slugController.dispose();
+    _fallbackController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _regenerateShortCode() {
@@ -157,9 +169,9 @@ class _CreateLinkModalState extends State<CreateLinkModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Create Rice Short Link & QR Code",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RiceColors.riceBlue),
+                      style: RiceTheme.heading(fontSize: 24, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
@@ -180,59 +192,64 @@ class _CreateLinkModalState extends State<CreateLinkModal> {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: RiceColors.errorRed.withValues(alpha: 0.3)),
                     ),
-                    child: Text(_error!, style: const TextStyle(color: RiceColors.errorRed, fontSize: 13)),
+                    child: Text(_error!, style: RiceTheme.body(color: RiceColors.errorRed, fontSize: 13)),
                   ),
                 ],
 
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isTwoColumn = constraints.maxWidth > 650;
-                        final details = LinkFormDetails(
-                          destController: _destController,
-                          slugController: _slugController,
-                          isSlugEditable: true,
-                          onRegenerateSlug: _regenerateShortCode,
-                          hasExpiration: _hasExpiration,
-                          expiresAt: _expiresAt,
-                          onToggleExpiration: (val) {
-                            setState(() {
-                              _hasExpiration = val;
-                              if (val && _expiresAt == null) {
-                                _expiresAt = DateTime.now().add(const Duration(days: 7));
-                              }
-                            });
-                          },
-                          onPickExpirationDate: _pickExpirationDate,
-                          fallbackController: _fallbackController,
-                        );
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.only(right: 16, bottom: 8),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isTwoColumn = constraints.maxWidth > 650;
+                          final details = LinkFormDetails(
+                            destController: _destController,
+                            slugController: _slugController,
+                            isSlugEditable: true,
+                            onRegenerateSlug: _regenerateShortCode,
+                            hasExpiration: _hasExpiration,
+                            expiresAt: _expiresAt,
+                            onToggleExpiration: (val) {
+                              setState(() {
+                                _hasExpiration = val;
+                                if (val && _expiresAt == null) {
+                                  _expiresAt = DateTime.now().add(const Duration(days: 7));
+                                }
+                              });
+                            },
+                            onPickExpirationDate: _pickExpirationDate,
+                            fallbackController: _fallbackController,
+                          );
 
-                        final qrStudio = LinkFormQrStudio(
-                          previewUrl: previewUrl,
-                          qrConfig: _qrConfig,
-                          onQrConfigChanged: (cfg) => setState(() => _qrConfig = cfg),
-                        );
+                          final qrStudio = LinkFormQrStudio(
+                            previewUrl: previewUrl,
+                            qrConfig: _qrConfig,
+                            onQrConfigChanged: (cfg) => setState(() => _qrConfig = cfg),
+                          );
 
-                        if (isTwoColumn) {
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          if (isTwoColumn) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(flex: 5, child: details),
+                                const SizedBox(width: 28),
+                                Expanded(flex: 5, child: qrStudio),
+                              ],
+                            );
+                          }
+
+                          return Column(
                             children: [
-                              Expanded(flex: 5, child: details),
-                              const SizedBox(width: 28),
-                              Expanded(flex: 5, child: qrStudio),
+                              details,
+                              const SizedBox(height: 24),
+                              qrStudio,
                             ],
                           );
-                        }
-
-                        return Column(
-                          children: [
-                            details,
-                            const SizedBox(height: 24),
-                            qrStudio,
-                          ],
-                        );
-                      },
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -245,7 +262,7 @@ class _CreateLinkModalState extends State<CreateLinkModal> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Cancel"),
+                      child: Text("Cancel", style: RiceTheme.body(fontSize: 14, fontWeight: FontWeight.w600, color: RiceColors.riceBlue)),
                     ),
                     const SizedBox(width: 12),
                     RiceButton(

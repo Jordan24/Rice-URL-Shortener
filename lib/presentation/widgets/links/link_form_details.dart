@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../../core/utils/code_generator.dart';
 import '../../../core/utils/url_validator.dart';
 import '../common/rice_text_field.dart';
@@ -34,9 +35,9 @@ class LinkFormDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Link Details",
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: RiceColors.textPrimary),
+          style: RiceTheme.heading(fontSize: 18, fontWeight: FontWeight.w700, color: RiceColors.riceBlue),
         ),
         const SizedBox(height: 14),
 
@@ -55,9 +56,12 @@ class LinkFormDetails extends StatelessWidget {
             label: "Custom Alias / Short Code *",
             hint: "5-char code or custom slug",
             controller: slugController,
-            prefix: const Padding(
-              padding: EdgeInsets.only(left: 12, right: 6, top: 14),
-              child: Text("rice.link/", style: TextStyle(color: RiceColors.riceBlue, fontWeight: FontWeight.bold, fontSize: 13)),
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 12, right: 6, top: 14),
+              child: Text(
+                "rice.link/",
+                style: RiceTheme.body(color: RiceColors.riceBlue, fontWeight: FontWeight.w700, fontSize: 13),
+              ),
             ),
             suffix: onRegenerateSlug != null
                 ? Tooltip(
@@ -78,9 +82,9 @@ class LinkFormDetails extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               "Set Expiration Date",
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
+              style: RiceTheme.body(fontSize: 13, fontWeight: FontWeight.w600, color: RiceColors.textPrimary),
             ),
             Switch(
               value: hasExpiration,
@@ -110,7 +114,7 @@ class LinkFormDetails extends StatelessWidget {
                     expiresAt != null
                         ? DateFormat("MMM d, yyyy at h:mm a").format(expiresAt!)
                         : "Select Date & Time",
-                    style: const TextStyle(fontSize: 13, color: RiceColors.textPrimary),
+                    style: RiceTheme.body(fontSize: 13, color: RiceColors.textPrimary),
                   ),
                   const Spacer(),
                   const Icon(Icons.edit, size: 14, color: RiceColors.textSecondary),

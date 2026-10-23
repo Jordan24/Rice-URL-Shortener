@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/rice_colors.dart';
+import '../../../core/theme/rice_theme.dart';
 import '../../state/link_controller.dart';
 
 class LinkSearchBar extends StatefulWidget {
@@ -60,8 +61,10 @@ class _LinkSearchBarState extends State<LinkSearchBar> {
                   child: TextField(
                     controller: _controller,
                     onChanged: widget.onSearchChanged,
+                    style: RiceTheme.body(fontSize: 14, color: RiceColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: "Search short codes or destination URLs...",
+                      hintStyle: RiceTheme.body(fontSize: 14, color: RiceColors.textSecondary.withValues(alpha: 0.7)),
                       prefixIcon: const Icon(Icons.search, color: RiceColors.textSecondary, size: 20),
                       suffixIcon: widget.searchQuery.isNotEmpty
                           ? IconButton(
@@ -125,7 +128,7 @@ class _LinkSearchBarState extends State<LinkSearchBar> {
       onSelected: (_) => widget.onStatusChanged(filter),
       selectedColor: RiceColors.riceBlue,
       backgroundColor: Colors.white,
-      labelStyle: TextStyle(
+      labelStyle: RiceTheme.body(
         color: isSelected ? Colors.white : RiceColors.textPrimary,
         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
         fontSize: 13,

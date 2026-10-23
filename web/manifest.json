@@ -3,9 +3,9 @@
     "short_name": "rice_url_shortener",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#00205B",
+    "theme_color": "#00205B",
+    "description": "Official Rice University URL Shortener and Custom QR Code Studio.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
